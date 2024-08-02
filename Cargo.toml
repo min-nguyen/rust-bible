@@ -8,5 +8,4 @@ edition = "2021"
 [dependencies]
 
 
-[[src]]
-name = "boolean" # 2_memory/3_references_and_pointers.rs
+[1_basics]

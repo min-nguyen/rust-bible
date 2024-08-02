@@ -16,11 +16,11 @@ fn string_slices(){
   //   2, the length of the string slice on the binary
   let ptr = s.as_ptr();
   let len = s.len();
-  print!("For string slice {s},  {len}")
+  print!("For string slice {s},  {len}");
 
   // We can also allocate a String that stores a string slice.
   // Below will create an owner of type String whose value points to data "hello" allocated on the heap
-  let s_mutable: String = String::from(s_immutable);
+  let s_mutable: String = String::from(s);
 }
 
 //  The `str` type represents a sequence of UTF-8 encoded characters in Rust (stored in )

@@ -1,5 +1,7 @@
 use std::io;
 
+// mod _1_variables{
+
 // # Variables
 fn variables(){
 
@@ -13,7 +15,7 @@ fn variables(){
 
     // ### Constants
     // Constants are declared using `const .. = ..;` and exactly the same as immutable variables, except:
-    //   1. They can be declared in any scope including the global scope
+    //   1. They can be declared in sany scope including the global scope
     //   2. They can only be set to constant expressions and not the result of a value that is only computable at runtime.
     const THREE_HOURS_IN_SECONDS : u32 = 60 * 60 * 3;
 
@@ -23,3 +25,5 @@ fn variables(){
     x = 6;    // allowed
     println!("The value of x is: {x}");
 }
+
+// }

@@ -1,3 +1,4 @@
+use std::io;
 
 // # Data Types
 // Every value in Rust is of a certain data type, where type annotations are specified with `:`.

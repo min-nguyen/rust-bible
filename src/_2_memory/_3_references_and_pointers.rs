@@ -36,11 +36,11 @@ fn reference_example_1() {
     // Explicitly deference and print out the value
     println!("x = {}", *ref_x);
     // Implicitly deference and print out the value
-    printsln!("x = {}",  ref_x);
+    println!("x = {}",  ref_x);
 }
 
 fn reference_example_2() {
-    fn calculate_length(s_ref: &String) -> usize { // s is a reference to a String
+    fn calculate_length(ref_s: &String) -> usize { // s is a reference to a String
         (*ref_s).len();  // Explicitly dereference it from &String to String to call the len() method.
         ref_s.len()      // Implicitly dereference it from &String to String to call the len() method.
     } // Here, s goes out of scope. But because it does not have ownership of the string data it indirectly refers to, that data is not freed.

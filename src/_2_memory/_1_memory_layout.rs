@@ -14,8 +14,8 @@
 //     1. Every function call pre-allocates a stack frame, providing enough memory for its arguments and local variables.
 //     2. As local variables are introduced, their data is pushed onto the stack.
 //     3. Every function exit pops all the data in the stack frame off the stack.
-fn foo( x : uint32     // <-- x is pushed onto stack
-      , y : &uint32) { // <-- y is pushed onto stack
+fn foo( x : u32     // <-- x is pushed onto stack
+      , y : &u32) { // <-- y is pushed onto stack
     let z = x;         // <-- z is pushed onto stack
 }                      // <-- z, y, then x are popped off of stack
 //    +--------+

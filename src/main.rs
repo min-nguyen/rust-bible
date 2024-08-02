@@ -7,8 +7,8 @@ mod _1_basics {
 mod _2_memory {
     mod _1_memory_layout;
     mod _2_owners;
-    mod _3_references_and_pointers;
-    mod _4_slices;
+    mod _3_references;
+    mod _4_slice_references;
 }
 
 // mod submodule2;

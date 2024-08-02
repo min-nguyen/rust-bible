@@ -1,19 +1,26 @@
 // -----------------------------------------------
 // # OWNERS AND OWNERSHIP
-// A Variable is called an OWNER wrt to some value if it is the sole owner of that value (typically on the heap).
-// An OWNER (variable) of heap-allocated data is  represented in the stack as three parts:
+// A Variable is called an OWNER wrt to some value if it is the sole owner of that value.
+// The concept of "owning" a value does not always imply that the value is stored on the heap.
+
+// An OWNER (variable) of STACK-ALLOCATED data is simply that data itself:
+//      [ADDR   (variable)  VALUE   ]
+//      [0          x      [1,2,3]  ]
+//      [..        ...       ..     ]
+//                STACK
+
+// An OWNER (variable) of HEAP-ALLOCATED data is represented in the stack as three parts:
 //    1. a pointer to the heap memory holding the contents of the data
 //    2. a length
 //    3. a capacity being the total amount of heap memory
-
-//    [NAME     = VALUE]      [ IDX = VALUE ]
-//    [ptr      = ...  ] -->  [ 0   = 'h'   ]
-//    [len      = 5    ]      [ 1   = 'e'   ]
-//    [capacity = 5    ]      [ 2   = 'l'   ]
-//                            [ 3   = 'l'   ]
-//                            [ 4   = '0'   ]
-//                                  ...
-//         OWNER                 HEAP DATA
+//      [ADDR  (variable)       VALUE                 ]      [ ADDR  VALUE ]
+//      [ ..     s         [ptr=0xef, len, capacity]] ] -->  [ 0xef  'h'   ]
+//      [ ..     ..         ..                        ]      [ ..    'e'   ]
+//                                                           [ ..    'l'   ]
+//                                                           [ ..    'l'   ]
+//                                                           [ ..    '0'   ]
+//                                                           [ ...         ]
+//                  STACK                                         HEAP
 
 // Rules of ownership:
 //      1. Each value has an owner

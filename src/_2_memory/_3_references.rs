@@ -1,4 +1,3 @@
-mod references_and_pointers {
 
 // -----------------------------------------------
 // # REFERENCES AND BORROWING
@@ -9,14 +8,21 @@ mod references_and_pointers {
 // A reference is represented in the stack as just one part:
 //   - A pointer to an owner (or another reference)
 
-//   [NAME     = VALUE]         [NAME     = VALUE]      [ IDX = VALUE ]
-//   [ptr      = ...  ]  --->   [ptr      = ...  ] -->  [ 0   = 'h'   ]
-//                              [len      = 5    ]      [ 1   = 'e'   ]
-//                              [capacity = 5    ]      [ 2   = 'l'   ]
-//                                                      [ 3   = 'l'   ]
-//                                                      [ 4   = '0'   ]
-//                                   ...
-//      REFERENCE                   OWNER                 HEAP DATA
+// A reference to a variable whose value is stored on the stack
+//      [ADDR  (variable)      VALUE                       ]
+//      [ ..      ref          [ptr = 0x7f]                ]
+//      [ 0x7f    x            5                           ]
+//                  STACK
+
+// A reference to a variable whose value is stored on the heap
+//      [ADDR  (variable)      VALUE                       ]            [ ADDR  VALUE ]
+//      [ ..      ref          [ptr = 0x7f]                ]            [ 0xef  'h'   ]
+//      [ 0x7f    x            [ptr = 0xef, len, capacity] ]  -->       [ 1     'e'   ]
+//                                                                      [ 2     'l'   ]
+//                                                                      [ 3     'l'   ]
+//                                                                      [ 4     '0'   ]
+//                                                                      [ ...         ]
+//                  STACK                                                    HEAP
 
 // There are two types of References:
 //    1. Shared References (&). There can be as many of these
@@ -80,7 +86,6 @@ fn mut_reference_example() {
     s.push_str("s");
 }
 
-
 // As variables can be references, we can also have combinations of (im)mutable variables that are (im)mutable references.
 //   - `y: &i32`: Immutable variable y is an immutable reference to an i32 value.
 //     You're not allowed to change anything.
@@ -90,9 +95,6 @@ fn mut_reference_example() {
 //     You're allowed to modify the contents of the memory y is pointing at, but not to change where it's pointing.
 //   - `mut y: &mut i32`: Mutable variable y is a mutable reference to an i32 value.
 //     You're allowed to modify the memory y is pointing at or to point y at a new location.
-
-}
-
 
 // -------------------------------------------------------------------
 // ## DIFFERENCE BETWEEN REFERENCES AND POINTERS

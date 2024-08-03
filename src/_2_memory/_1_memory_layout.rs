@@ -1,19 +1,32 @@
 // -----------------------------------------------
 // # OVERVIEW: Binary, Stack, Heap, and Static Data Segment
 // https://github.com/amindWalker/Rust-Layout-and-Types
+// https://samolusola.me/understanding-stack-and-heap-memory-in-rust
 
-// -------------------------------------------------------------------------------------------------
-// Kernel Virtual Memory Space
+// ## Kernel Virtual Memory Space
 // This is the segment of virtual memory reserved for the OS kernel. It allows the OS to present the computer's physical memory to applications as a large and contiguous block of memory. The OS keeps track of the memory pages that are currently being used by the kernel and those that are available for use by applications. It also maps physical memory addresses to virtual memory addresses to access hardware devices and other system resources.
+// An application is typically provided the following virtual memory model.
+//    +----------------------------+
+//    | STACK                      |
+//    +----------------------------+
+//    |  ↓                         |
+//    +----------------------------+
+//    |  free memory               |
+//    +----------------------------+
+//    |  ↑                         |
+//    +----------------------------+
+//    | HEAP                       |
+//    +----------------------------+  \
+//    | BSS (Unintialised data)    |  |
+//    +----------------------------+  |- Binary
+//    | DATA (Initialised data)    |  |
+//    +----------------------------+  |
+//    | Text (Code Segment)        |  |
+//    +----------------------------+  /
+
 
 // -------------------------------------------------------------------------------------------------
-// Memory Address Range
-//   The memory address range is bounded by the word size of the CPU.
-//   In a 64-bits processor, the word size is 64 bits or 8 bytes.
-
-
-// -------------------------------------------------------------------------------------------------
-// Binary
+// ### Binary
 //   The output of the compilation process is a binary executable, which contains machine code and sections for different types of data, including instructions for setting up and managing the stack and heap. Executing the binary will have the OS load it into memory and begin executing the instructions.
 //   Parts of the Binary include:
 //   - Text Segment (Code Segment)
@@ -25,17 +38,15 @@
 //   - BSS (Block Started by Symbol)
 //     This stores uninitialised variables.
 
-
-// In Rust, memory is organized into stack, heap, and a static memory region.
-
 // -------------------------------------------------------------------------------------------------
 // ### Stack
 //    The Stack is a fixed size region of memory that can store values with a known size (such as pointers) at compile-time.
 //    The Stack memory starts from a higher address and grows downwards towards lower addresses.
 
-//    The binary’s instructions manage the stack by managing a stack pointer and allocating "stack frames" for function calls that can store their local variables, pushing and popping off this data in a FIFO manner:
-//       1. Every function call pre-allocates a stack frame, providing enough memory for its arguments and local variables.
-//       2. As local variables are introduced, their data is pushed onto the stack inside the region of that function's frame.
+//    The binary’s instructions manage the stack by managing a stack pointer and allocating "stack frames" for function calls that
+//    stores the function's parameters, local variables, and return address, pushing and popping off this data in a FIFO manner:
+//       1. Every function call allocates a stack frame, providing enough memory for its arguments, local variables, and return address.
+//       2. As variables are introduced, their data is pushed onto the stack within that function's stack frame.
 //       3. Every function exit pops all the data in the stack frame off the stack.
 
 // Example:
@@ -69,18 +80,20 @@ fn _double(n: i32) -> i32 {
 //    |                            |  \
 //    | ...............            |   |- FREE MEMORY
 //    |                            |  /
-//    +----------------------------+  \
-//    |                            |  |
-//    | ............            |  |  |- HEAP
-//    |                            |  |
-//    +----------------------------+  /
+//    +----------------------------+
 
 // -------------------------------------------------------------------------------------------------
 // ### Heap
-//     The Heap is a flexibly sized region of memory that can change at runtime.
+//     The Heap is a flexibly sized region of memory that can change at runtime and stores dynamically sized data.
 //     The Heap memory starts from lower addreses and grows upwards towards higher addresses.
 
 //     The binary's instructions include calls to the allocator to request and free memory.
+//      1. Allocation:
+//         The allocator finds an empty spot in the Heap big enough for the space requested,
+//         marks the spot as 'being in use', and returns a pointer to the memory address of that location.
+//      2. Deallocation:
+//         The allocator releases the allocated memory, marks the spot as available for future #
+//         reallocation, and the pointer referencing that space becomes invalid.
 
 
 // -------------------------------------------------------------------------------------------------
@@ -97,7 +110,6 @@ fn _double(n: i32) -> i32 {
     // 2. The stack's contiguous memory layout means that when the CPU loads data from the stack into its cache, it often loads adjacent data as well,
     // 3. Simple Pointer Arithmetic: Accessing stack variables involves simple pointer arithmetic, which is efficient and fast.
 // Heap access is slower because you have to follow a pointer to get there: contemporary processors are faster if they jump around less in memory.
-
 
 // -------------------------------------------------------------------------------------------------
 // ### Allocation: Stack vs Heap

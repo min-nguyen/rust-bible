@@ -17,9 +17,9 @@
 //    +----------------------------+
 //    | HEAP                       |
 //    +----------------------------+  \
-//    | BSS (Unintialised data)    |  |
-//    +----------------------------+  |- Binary
-//    | DATA (Initialised data)    |  |
+//    | BSS (Uninitialised data)   |  |
+//    +----------------------------+  |
+//    | DATA (Initialised data)    |  |- Executable Binary
 //    +----------------------------+  |
 //    | Text (Code Segment)        |  |
 //    +----------------------------+  /
@@ -27,7 +27,9 @@
 
 // -------------------------------------------------------------------------------------------------
 // ### Binary
-//   The output of the compilation process is a binary executable, which contains machine code and sections for different types of data, including instructions for setting up and managing the stack and heap. Executing the binary will have the OS load it into memory and begin executing the instructions.
+//   The output of the compilation process is a binary executable, which contains machine code and sections for different types of data.
+//   This includes instructions for setting up and managing the stack and heap.
+//   Executing the binary will have the OS load it into memory and begin executing the instructions.
 //   Parts of the Binary include:
 //   - Text Segment (Code Segment)
 //     This is where the Rust code is compiled (by LLVM) into machine code and stored for later execution.
@@ -37,6 +39,12 @@
 //     which have a defined value at compile-time that does not change at run time.
 //   - BSS (Block Started by Symbol)
 //     This stores uninitialised variables.
+
+// -------------------------------------------------------------------------------------------------
+// ### Data Segment
+//     The (static) data segment is a special read-only region of memory that is part of the program's binary.
+//     It stores "static variables" which can be treated with the same lifetime as the program and not bound to a specific scope.
+//     These include global variables and static local variables.
 
 // -------------------------------------------------------------------------------------------------
 // ### Stack
@@ -55,7 +63,6 @@ fn _main() {
     let b = _double(a);
     println!("{b}");
 }
-
 fn _double(n: i32) -> i32 {
     n * 2
 }
@@ -63,7 +70,6 @@ fn _double(n: i32) -> i32 {
 // 2. When the variable b calls the function double(), a new stack frame is created for the double() function. The stack pointer is updated to point to the new stack frame, but the change in the stack pointer depends on the size of the function arguments and local variables.
 // 3. The parameter n is stored in the stack frame for the double() function and takes up 4 bytes of memory. The return address is stored in the stack, and its size depends on the architecture of the system and the operating system.
 // 4. The double() function terminates and the operating system deallocates the stack frame for the double() function. The stack pointer is updated to point to the previous stack frame, and the return value is stored in the variable b in the main() function. The main() function ends and the whole program terminates.
-
 //    +----------------------------+  \
 //    | _main ()                   |  |
 //    +----------------------------+  |
@@ -96,15 +102,9 @@ fn _double(n: i32) -> i32 {
 //         reallocation, and the pointer referencing that space becomes invalid.
 
 
-// -------------------------------------------------------------------------------------------------
-// ### Static Memory Region
-//     The static data segment is a special read-only region of memory that is part of the program's binary.
-//     It stores "static variables" which can be treated with the same lifetime as the program and not bound to a specific scope.
-//     These include global variables and static local variables.
-
 
 // -------------------------------------------------------------------------------------------------
-// ### Access: Stack vs Heap:
+// ### Access: Stack vs Heap
 // Stack access is faster because we never have to follow a pointer to get there, it is always relative to the top of the stack. This is true even if the data isn't always at the top:
     // 1. Local variables in a function have fixed offsets from the stack pointer or base pointer, making access straightforward and fast.
     // 2. The stack's contiguous memory layout means that when the CPU loads data from the stack into its cache, it often loads adjacent data as well,

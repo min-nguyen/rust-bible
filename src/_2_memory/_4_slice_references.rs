@@ -14,22 +14,7 @@
 // By also including the slice length in the reference, this lets us talk about part of a data and give our reference a known size to refer to, while allowing the size of the slice reference type itself to be known.
 
 
-// --------------------------------------------------------------------------------
-// ## i32 SLICES (&str)
-fn i32_slices() {
-  // Creates a fixed-size array stored on stack.
-  let  xs:  [i32; 5] = [1, 2, 3, 4, 5];
 
-  // Creates a reference to a slice that borrows the whole array.
-  analyze_slice(&xs);
-  // Creates a reference to a slice that borrows part of the array.
-  analyze_slice(&xs[1..3]);
-
-  fn analyze_slice(slice: &[i32]) {
-    println!("First element of the slice: {}", slice[0]);
-    println!("The slice has {} elements", slice.len());
-  }
-}
 
 // --------------------------------------------------------------------------------
 // ## STRING SLICES (&str)
@@ -46,7 +31,6 @@ fn string_slices(){
   let slice = &s[0..2];
   let slice = &s[..2];
 }
-
 // ### STRING SLICES AS PARAMETERS
 // A parameter of type &str can accept both String references (&String) and string slices (&str).
 // 1. If we choose to provide an argument of type &String, this is the same as a slice &str of the entire string.
@@ -62,7 +46,6 @@ fn get_first_word(s: &mut str) ->  &str {
 
   &s[..]
 }
-
 // ### STRING LITERALS AS SLICES
 //  String literals are interpreted directly as a reference to a string slice.
 //  The data of a string slice is hardcoded in the read-only section of the executable binary.
@@ -82,6 +65,22 @@ fn string_literals(){
   let s = String::from(s);
 }
 
+// --------------------------------------------------------------------------------
+// ## OTHER SLICES
+fn i32_slices() {
+  // Creates a fixed-size array stored on stack.
+  let  xs:  [i32; 5] = [1, 2, 3, 4, 5];
+
+  // Creates a reference to a slice that borrows the whole array.
+  analyze_slice(&xs);
+  // Creates a reference to a slice that borrows part of the array.
+  analyze_slice(&xs[1..3]);
+
+  fn analyze_slice(slice: &[i32]) {
+    println!("First element of the slice: {}", slice[0]);
+    println!("The slice has {} elements", slice.len());
+  }
+}
 
 // --------------------------------------------------------------------------------
 // ## MUTABLE SLICE REFERENCES

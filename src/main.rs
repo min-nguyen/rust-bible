@@ -10,6 +10,9 @@ mod _2_memory {
     mod _3_references;
     mod _4_slice_references;
 }
+mod _3_structured_data {
+    mod _1_structs;
+}
 
 // mod submodule2;
 fn main() {

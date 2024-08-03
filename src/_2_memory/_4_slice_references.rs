@@ -14,8 +14,6 @@
 // By also including the slice length in the reference, this lets us talk about part of a data and give our reference a known size to refer to, while allowing the size of the slice reference type itself to be known.
 
 
-
-
 // --------------------------------------------------------------------------------
 // ## STRING SLICES (&str)
 // A string slice (str) is essentially the type [u8], a sequence of UTF-8 encoded characters.

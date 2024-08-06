@@ -101,10 +101,10 @@ fn mut_reference_example() {
 
 // References and Pointers have the same underlying representation: both hold an address for some memory.
 // Their difference is purely in their semantic interpretation,
-// A reference variable provides a new name to an existing variable.
-//      Interacting with a reference will refer to the underlying value it points to.
-//      A reference does not need the dereferencing operator * to retrieve the value referenced.
-// A pointer variable stores an arbitrary address (and can be null!).
+// A reference variable stores the address of an existing variable (or unnamed value) that is already allocated in memory.
+//      Interacting with a reference will refer to the underlying value of that address.
+//      A reference does not need the dereferencing operator * to retrieve the value referenced, but is automatically determined by Rust (via pointer indirections where necessary).
+// A pointer variable stores any arbitrary address (and can be null!).
 //      Interacting with a pointer will be directly modifying the address it stores.
 //      A pointer always needs to be dereferenced * to actually interact with the value it points to.
 // In addition, references have rules enforced by the compiler:

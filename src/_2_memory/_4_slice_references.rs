@@ -1,18 +1,43 @@
 // -----------------------------------------------
 // # SLICE REFERENCES
-// A slice [T] is a contiguous sequence of data of type T stored in memory, being a slice of some collection rather than the entire collection itself.
-// A slice reference &[T] is a reference to that slice. Many times, people talk about &[T] as the slice.
+// A SLICE [T] is a contiguous sequence of data of type T stored in memory, being a slice of some collection rather than the entire collection itself.
+// A SLICE REFERENCE &[T] (or fat pointer) is represented in the stack as two parts:
+//    1. a pointer to the heap memory holding the contents of the slice
+//    2. a slice length
+// By including the slice length in the reference, this lets us talk about part of a data and give our reference a known size to refer to, while allowing the size of the slice reference type itself to be known.
 
-// A slice reference is a fat pointer and has two parts: a pointer and a slice length.
-//      [ADDR  (variable)      VALUE                  ]           [ADDR    VALUE  ]
-//      [ ..     slice_ref     [ptr = 0xef, len = 3]  ]   -->     [ 0xef  'h'     ]  }
-//                                                                [ ..    'e'     ]  }  <<-- *slice_ref = "hel"
-//                                                                [ ..    'l'     ]  }
-//                                                                [ ..    'l'     ]
-//                                                                [ ..    '0'     ]
-//                   STACK                                    SOME MEMORY (stack or heap)
-// By also including the slice length in the reference, this lets us talk about part of a data and give our reference a known size to refer to, while allowing the size of the slice reference type itself to be known.
-
+// A SLICE REFERENCE to STACK-ALLOCATED data:
+fn slice_example() {
+  let arr: [i32; 5] = [1, 2, 3, 4, 5]; // An array stored on the stack
+  let arr_ref: &[i32; 5] = &arr;       // A normal reference to all of the array.
+                                       // Its type includes the array's length, determined at compile-time.
+  let slice: &[i32] = &arr[1..4];      // A slice reference to part of the array (elements 2, 3, and 4),
+                                       // Its value includes the slice's length, determined at run time.
+  let wholeslice: &[i32] = &arr[..];   // A slice reference to all of the array
+                                       // Its value includes the slice's length, determined at run time.
+}
+//  STACK:
+// +------------------------------------+
+// | Stack Frame: slice_example         |
+// +------------------------------------+
+// | arr: [1, 2, 3, 4, 5]               |  <--- `arr` is an array stored on the stack
+// |    (address = 0x7ffeefbff4a0,      |
+// |             ..,                    |
+// |             ..,                    |
+// |             ..,                    |
+// |             ..0x7ffeefbff4b3 )     |
+// +-------------------------------------+
+// | arr_ref:  0x7ffeefbff4a0           |  <--- `arr_ref` is a reference to the array.
+// |    (address = 0x7ffeefbff4b4)      |        The length of the array is known at compile-time, and need not be stored in memory.
+// +------------------------------------+
+// | slice: { ptr: 0x7ffeefbff4a4,      |  <--- `slice` is a slice reference to an array portion starting `arr[1]` to `arr[3]`.
+// |          len: 3 }                  |
+// |    (address = 0x7ffeefbff4bc)      |
+// +------------------------------------+
+// | wholeslice: { ptr: 0x7ffeefbff4a0, |  <--- `wholeslice` is a slice reference to the entire array portion starting `arr[0]` to `arr[4]`.
+// |               len: 5 }             |
+// |    (address = 0x7ffeefbff4c4)      |
+// +------------------------------------+
 
 // --------------------------------------------------------------------------------
 // ## STRING SLICES (&str)

@@ -11,7 +11,7 @@ fn owner_stack() {
 // +--------------------------------+
 // | Stack Frame: owner_stack       |
 // +--------------------------------+
-// | x: 42                          |  <--- x owns the stack-allocated data
+// | x: 42                          |  <--- x owns the stack-allocated integer
 // +--------------------------------+
 
 // An OWNER (variable) of HEAP-ALLOCATED data is represented in the stack as three parts:
@@ -20,7 +20,6 @@ fn owner_stack() {
 //    3. a capacity being the total amount of heap memory
 fn owner_heap() {
     let x = Box::new(42); // x owns the heap-allocated integer
-    let y = &x;           // y is a reference to x
 }
 //  STACK:
 // +--------------------------------+
@@ -29,8 +28,6 @@ fn owner_heap() {
 // | x: Box { ptr: 0x1234,          |  <--- x owns the heap-allocated data
 // |          len:..,               |
 // |          capacity:.., }        |
-// +--------------------------------+
-// | y: &Box { ptr: 0x7ffeefbff4a0} |  <--- y is a reference to x
 // +--------------------------------+
 //  HEAP:
 // +--------------------------------+
@@ -47,6 +44,7 @@ fn owner_heap() {
 
 // -------------------------------------------------------------------------------------------------
 // ### VARIABLE SCOPE
+
 fn variable_scope(){ // A stack frame that allocates memory for local variable s.
   {
       // A variable of type String is an owner of a dynamic, growable string stored in the heap-allocated buffer.
@@ -57,33 +55,12 @@ fn variable_scope(){ // A stack frame that allocates memory for local variable s
 
 // -------------------------------------------------------------------------------------------------
 // ### OWNERSHIP in VARIABLE ASSIGNMENTS: Copying, Moving, and Cloning Data
-// [MOVE]: Heap-Only Data
-//   When assigning new variables to dynamic data that is already stored on the heap, we perform a "shallow copy".
-//   This is called a MOVE.
-fn move_dynamic_data(){ // A stack frame that allocates memory for local variables s1 and s2 is created.
-    {
-        // Create an owner s1 of type String whose value points to data "hello" newly allocated on the heap, and push s1 onto the stack.
-        let s1: String = String::from("hello");   // <<-- s1 is valid
-        // Move the value of s1 to a new owner s2, and push s2 onto the stack. We do not copy the data on the heap that is pointed to.
-        let s2: String = s1;                      // <<-- s2 is now valid and s1 is no longer valid
-    } // <<-- s2 is no longer valid, so we free the memory it points to on the heap .
-}
-// [CLONE]: Heap-Only Data
-//   If we _do_ want to actually copy heap data when assigning new variables to it, we perform a "deep copy".
-//   This is called a CLONE.
-fn clone_dynamic_data(){  // A stack frame that allocates memory for local variables s1 and s2 is created.
-    {
-        // Create an owner s1 of type String whose value points to "hello" newly allocated on the heap, and push s1 onto the stack.
-        let s1: String = String::from("hello");   // <<-- s1 is valid
-        // Create a new owner s2 whose value is distinct from s1's and points to a different "hello" newly allocated on the heap, and push s2 onto the stack.
-        let s2: String = s1.clone();              // <<-- s2 is now valid and s1 is still valid
-    } // <<-- s1 and s2 are no longer valid, so we free both of their memories (i.e. "hello" and "hello") they point to on the heap.
-}
+
 // [COPY]: Stack-Only Data
-//   When assigning new variables to static data that is already stored on the stack, there is no difference between deep
-//   and shallow copying here. Thus we can simply copy that data.
+//   When assigning new variables to static data that is already stored on the stack, we can simply copy that data.
 //   This is called a COPY.
-fn copy_static_data(){  // A stack frame that allocates memory for local variables x and y is created.
+//   (In contrast to assigning ownership for dynamic data, there is no difference between deep and shallow copying here).
+fn copy_static_data(){ // A stack frame that allocates memory for local variables x and y is created.
     {
         // Create an owner x whose value is 5, and push onto the stack
         let x: i32 = 5;      // <<-- x is valid
@@ -102,6 +79,30 @@ fn copy_static_data(){  // A stack frame that allocates memory for local variabl
     //      Floating-point types, such as f64.
     //      Character types, char.
     //      Tuples if they only contain types that also implement Copy.
+
+// [MOVE]: Heap-Only Data
+//   When assigning new variables to dynamic data that is already stored on the heap, we perform a "shallow copy".
+//   This is called a MOVE.
+fn move_dynamic_data(){ // A stack frame that allocates memory for local variables s1 and s2 is created.
+    {
+        // Create an owner s1 of type String whose value points to data "hello" newly allocated on the heap, and push s1 onto the stack.
+        let s1: String = String::from("hello");   // <<-- s1 is valid
+        // Move the value of s1 to a new owner s2, and push s2 onto the stack. We do not copy the data on the heap that is pointed to.
+        let s2: String = s1;                      // <<-- s2 is now valid and s1 is no longer valid
+    } // <<-- s2 is no longer valid, so we free the memory it points to on the heap .
+}
+
+// [CLONE]: Heap-Only Data
+//   If we _do_ want to actually copy heap data when assigning new variables to it, we perform a "deep copy".
+//   This is called a CLONE.
+fn clone_dynamic_data(){  // A stack frame that allocates memory for local variables s1 and s2 is created.
+    {
+        // Create an owner s1 of type String whose value points to "hello" newly allocated on the heap, and push s1 onto the stack.
+        let s1: String = String::from("hello");   // <<-- s1 is valid
+        // Create a new owner s2 whose value is distinct from s1's and points to a different "hello" newly allocated on the heap, and push s2 onto the stack.
+        let s2: String = s1.clone();              // <<-- s2 is now valid and s1 is still valid
+    } // <<-- s1 and s2 are no longer valid, so we free both of their memories (i.e. "hello" and "hello") they point to on the heap.
+}
 
 // -------------------------------------------------------------------
 // ### OWNERSHIP in FUNCTION CALLS

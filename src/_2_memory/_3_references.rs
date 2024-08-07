@@ -1,29 +1,56 @@
 
 // -----------------------------------------------
 // # REFERENCES AND BORROWING
-// A variable is a REFERENCE to some value if it POINTS to the OWNER of that value.
+// A variable is a REFERENCE to some value if it (possibly indirectly) POINTS to the OWNER of that value.
 //    This allows you to BORROW (read) that value without taking ownership of it, without making a copy,
 //    and without preventing the original owner from accessing it once you're done.
 //    Unlike a pointer, a reference is guaranteed to point to a valid value of a particular type for the life of that reference.
-// A reference is represented in the stack as just one part:
-//   - A pointer to an owner (or another reference)
+// A REFERENCE is represented in the stack as just one part:
+//   - { ptr : 0x... } A pointer to another variable or value.
 
-// A reference to a variable whose value is stored on the stack
-//      [ADDR  (variable)      VALUE                       ]
-//      [ ..      ref          [ptr = 0x7f]                ]
-//      [ 0x7f    x            5                           ]
-//                  STACK
+// A REFERENCE to STACK-ALLOCATED data:
+fn ref_stack() {
+    let x = 42;  // x owns the stack allocated data 42
+    let y = &x; // y is a reference to x
+    let z = &7; // 7 is a temporary integer (not owned by any variable) stored on the stack
+}
+//  STACK:
+// +--------------------------------+
+// | Stack Frame: owner_stack       |
+// +--------------------------------+
+// | x:  42                         |  <---  x owns the stack allocated data 42.
+// |    (address = 0x7ffeefbff4a0)  |
+// +--------------------------------+
+// | y: 0x7ffeefbff4a0              |  <---  y is a reference to x
+// +--------------------------------+
+// | z: 0x7ffeefbff4a8              |  <---  z is a reference to a temporary integer 7
+// +--------------------------------+
+// | Temporary Value: 7             |  <---   7 is a temporary integer (not owned by any variable) stored on the stack
+// |    (address = 0x7ffeefbff4a8)  |
+// +--------------------------------+
 
-// A reference to a variable whose value is stored on the heap
-//      [ADDR  (variable)      VALUE                       ]            [ ADDR  VALUE ]
-//      [ ..      ref          [ptr = 0x7f]                ]            [ 0xef  'h'   ]
-//      [ 0x7f    x            [ptr = 0xef, len, capacity] ]  -->       [ 1     'e'   ]
-//                                                                      [ 2     'l'   ]
-//                                                                      [ 3     'l'   ]
-//                                                                      [ 4     '0'   ]
-//                                                                      [ ...         ]
-//                  STACK                                                    HEAP
+// An REFERENCE to HEAP-ALLOCATED data:
+fn ref_heap() {
+    let x = Box::new(42);  // x owns the heap-allocated integer
+    let y = &x;           // y is a reference to x
+}
+//  STACK:
+// +--------------------------------+
+// | Stack Frame: ref_heap          |
+// +--------------------------------+
+// | x: Box { ptr: 0x1234,          |  <--- x owns the heap-allocated data
+// |          len:..,               |
+// |          capacity:.., }        |
+// +--------------------------------+
+// | y: &Box { ptr: 0x7ffeefbff4a0} |  <--- y is a reference to x
+// +--------------------------------+
+//  HEAP:
+// +--------------------------------+
+// | 0x1234: 42                     |  <--- heap-allocated integer
+// +--------------------------------+
 
+// -------------------------------------------------------------------
+// # SHARED VS MUTABLE REFERENCES
 // There are two types of References:
 //    1. Shared References (&). There can be as many of these
 //    2. Mutable References (mut &)
@@ -56,8 +83,6 @@ fn reference_example_2() {
     println!("The length of '{s}' is {len}.");
 }
 
-
-// -------------------------------------------------------------------
 // ## MUTABLE REFERENCES (mutable borrowing)
 // A mutable reference (&mut) is allowed to mutate the value that it indirectly points to (not the address of the OWNER it points to).
 // Mutable references have some rules:

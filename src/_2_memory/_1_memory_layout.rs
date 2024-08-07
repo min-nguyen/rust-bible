@@ -4,26 +4,34 @@
 // https://samolusola.me/understanding-stack-and-heap-memory-in-rust
 
 // ## Kernel Virtual Memory Space
-// This is the segment of virtual memory reserved for the OS kernel. It allows the OS to present the computer's physical memory to applications as a large and contiguous block of memory. The OS keeps track of the memory pages that are currently being used by the kernel and those that are available for use by applications. It also maps physical memory addresses to virtual memory addresses to access hardware devices and other system resources.
-// An application is typically provided the following virtual memory model.
-//    +----------------------------+
-//    | STACK                      |
-//    +----------------------------+
-//    |  ↓                         |
-//    +----------------------------+
-//    |  free memory               |
-//    +----------------------------+
-//    |  ↑                         |
-//    +----------------------------+
-//    | HEAP                       |
-//    +----------------------------+  \
-//    | BSS (Uninitialised data)   |  |
-//    +----------------------------+  |
-//    | DATA (Initialised data)    |  |- Executable Binary
-//    +----------------------------+  |
-//    | Text (Code Segment)        |  |
-//    +----------------------------+  /
-
+// This is the segment of virtual memory reserved for the OS kernel. It allows the OS to present the computer's physical memory to programs as a large and contiguous block of memory. The OS keeps track of the memory pages that are currently being used by the kernel and those that are available for use by programs. It also maps physical memory addresses to virtual memory addresses to access hardware devices and other system resources.
+// An program is typically provided the following virtual memory model.
+// +-------------------------------+
+// |                               |
+// |           Stack               |   <-- Managed by OS at runtime
+// |             ↓                 |
+// +-------------------------------+
+// |                               |
+// |                               |
+// +-------------------------------+
+// |             ↑                 |
+// |           Heap                |   <-- Managed by OS at runtime
+// |                               |
+// |                               |
+// +-------------------------------+  \
+// |            BSS                |   |
+// | (Uninitialized Static Data.)  |   |
+// +-------------------------------+   |
+// |            DATA               |   |- Included in Executable Binary
+// |   (Initialized Static Data.)  |   |
+// +-------------------------------+   |
+// |        Text Segment           |   |
+// |       (Program Code)          |   |
+// +-------------------------------+  /
+// |       Environment Vars        |  <-- Managed by OS at runtime
+// +-------------------------------+
+// |      Command Line Args        |  <-- Managed by OS at runtime
+// +-------------------------------+
 
 // -------------------------------------------------------------------------------------------------
 // ### Binary
@@ -31,20 +39,15 @@
 //   This includes instructions for setting up and managing the stack and heap.
 //   Executing the binary will have the OS load it into memory and begin executing the instructions.
 //   Parts of the Binary include:
-//   - Text Segment (Code Segment)
+//   - Text Segment (Program Code)
 //     This is where the Rust code is compiled (by LLVM) into machine code and stored for later execution.
 //     The actual execution of the machine code instructions typically occurs elsewhere in memory.
-//   - Data Segment
-//     This is used to store initialised static variables, i.e. global and static local variables,
-//     which have a defined value at compile-time that does not change at run time.
-//   - BSS (Block Started by Symbol)
-//     This stores uninitialised variables.
-
-// -------------------------------------------------------------------------------------------------
-// ### Data Segment
-//     The (static) data segment is a special read-only region of memory that is part of the program's binary.
-//     It stores "static variables" which can be treated with the same lifetime as the program and not bound to a specific scope.
-//     These include global variables and static local variables.
+//   - Data Segment (Initialised Static Data)
+//     This is a special read-only region of memory for initialised static variables (which can be treated
+//     with the same lifetime as the program and not bound to a specific scope) which have a defined value at compile-time
+//     that does not change at run time.
+//   - BSS (Uninitialised Static Data)
+//     This stores uninitialised static variables.
 
 // -------------------------------------------------------------------------------------------------
 // ### Stack
@@ -59,34 +62,46 @@
 
 // Example:
 fn _main() {
-    let a = 48;
-    let b = _double(a);
-    println!("{b}");
+    let x = 48;
+    let y = &x;
+    let z = _double(y);
+    println!("{z}");
 }
-fn _double(n: i32) -> i32 {
+fn _double(n: &i32) -> i32 {
     n * 2
 }
-// 1. A stack frame is created for the main() function and the stack pointer is updated to point to the new stack frame. The local variable a is stored in the stack frame and takes up 4 bytes of memory.
-// 2. When the variable b calls the function double(), a new stack frame is created for the double() function. The stack pointer is updated to point to the new stack frame, but the change in the stack pointer depends on the size of the function arguments and local variables.
-// 3. The parameter n is stored in the stack frame for the double() function and takes up 4 bytes of memory. The return address is stored in the stack, and its size depends on the architecture of the system and the operating system.
-// 4. The double() function terminates and the operating system deallocates the stack frame for the double() function. The stack pointer is updated to point to the previous stack frame, and the return value is stored in the variable b in the main() function. The main() function ends and the whole program terminates.
+// 1. A stack frame is created for the main() function and the stack pointer is updated to point to the new stack frame. The local variable x is stored in the stack frame, and local variable y is a reference to x (points to x's address).
 //    +----------------------------+  \
-//    | _main ()                   |  |
+//    | Stack Frame: _main ()      |  |
 //    +----------------------------+  |
-//    | a = 48                     |  |
+//    | x : 48                     |  |
 //    +----------------------------+  |
-//    | b = 96                     |  |- STACK
+//    | y : 0x7ffeefbff4a0         |  |- STACK
 //    +----------------------------+  |
-//    | _double ()                 |  |
+// 2. When the function double() is called, the return address is stored in the stack, and a new stack frame is created for the double() function.  The parameter n is stored in the stack frame for the double() function. The stack pointer is updated to point to the new stack frame, but the change in the stack pointer depends on the size of the function arguments and local variables.
+//    +----------------------------+  \
+//    | Stack Frame: _main ()      |  |
 //    +----------------------------+  |
-//    | n = 48                     |  |
+//    | x : 48                     |  |
 //    +----------------------------+  |
-//    | fn return addr 0x12f = 96  |  |
-//    +----------------------------+  /
-//    |                            |  \
-//    | ...............            |   |- FREE MEMORY
-//    |                            |  /
-//    +----------------------------+
+//    | y : 0x7ffeefbff4a0         |  |- STACK
+//    +----------------------------+  |
+//    | Return Address: _main()    |  |
+//    +----------------------------+  |
+//    | Stack Frame: _double ()    |  |
+//    +----------------------------+  |
+//    | n : 0x7ffeefbff4a0         |  |
+//    +----------------------------+  |
+// 3. The double() function terminates and the operating system deallocates the stack frame for the double() function. The stack pointer is updated to point to the previous stack frame, and the return value is stored in the variable z in the main() function. The main() function ends and the whole program terminates.
+//    +----------------------------+  \
+//    | Stack Frame: _main ()      |  |
+//    +----------------------------+  |
+//    | x : 48                     |  |
+//    +----------------------------+  |
+//    | y : 0x7ffeefbff4a0         |  |- STACK
+//    +----------------------------+  |
+//    | z : 66                     |  |
+//    +----------------------------+  |
 
 // -------------------------------------------------------------------------------------------------
 // ### Heap

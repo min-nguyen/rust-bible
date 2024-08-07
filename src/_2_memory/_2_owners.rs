@@ -4,29 +4,45 @@
 // The concept of "owning" a value does not always imply that the value is stored on the heap.
 
 // An OWNER (variable) of STACK-ALLOCATED data is simply that data itself:
-//      [ADDR   (variable)  VALUE   ]
-//      [0          x      [1,2,3]  ]
-//      [..        ...       ..     ]
-//                STACK
+fn owner_stack() {
+    let x = 42; // x owns the stack-allocated integer
+}
+//  STACK:
+// +--------------------------------+
+// | Stack Frame: owner_stack       |
+// +--------------------------------+
+// | x: 42                          |  <--- x owns the stack-allocated data
+// +--------------------------------+
 
 // An OWNER (variable) of HEAP-ALLOCATED data is represented in the stack as three parts:
 //    1. a pointer to the heap memory holding the contents of the data
 //    2. a length
 //    3. a capacity being the total amount of heap memory
-//      [ADDR  (variable)       VALUE                 ]      [ ADDR  VALUE ]
-//      [ ..     s         [ptr=0xef, len, capacity]] ] -->  [ 0xef  'h'   ]
-//      [ ..     ..         ..                        ]      [ ..    'e'   ]
-//                                                           [ ..    'l'   ]
-//                                                           [ ..    'l'   ]
-//                                                           [ ..    '0'   ]
-//                                                           [ ...         ]
-//                  STACK                                         HEAP
+fn owner_heap() {
+    let x = Box::new(42); // x owns the heap-allocated integer
+    let y = &x;           // y is a reference to x
+}
+//  STACK:
+// +--------------------------------+
+// | Stack Frame: owner_heap        |
+// +--------------------------------+
+// | x: Box { ptr: 0x1234,          |  <--- x owns the heap-allocated data
+// |          len:..,               |
+// |          capacity:.., }        |
+// +--------------------------------+
+// | y: &Box { ptr: 0x7ffeefbff4a0} |  <--- y is a reference to x
+// +--------------------------------+
+//  HEAP:
+// +--------------------------------+
+// | 0x1234: 42                     |  <--- heap-allocated integer
+// +--------------------------------+
 
-// Rules of ownership:
+// RULES OF OWNERSHIP:
 //      1. Each value has an owner
 //      2. There can only be one owner at a time
 //      3. When the owner goes out of scope, the value is dropped
-// The point of ownership is to: keep track of what code is using what data on the heap, minimize duplicate data on the heap, and clean up unused data on the heap. To support this, each allocation is paired with exactly one free, i.e. the memory must be requested from the memory allocator at runtime, and we must return this memory to the allocator when we’re done with it.
+// The point of ownership is to keep track of what code is using what data on the heap, minimize duplicate data on the heap, and clean up unused data on the heap.
+// To support this, each runtime request for memory allocation must be paired with exactly one free which returns the memory when we’re done with it.
 // In Rust, memory is automatically freed once the variable that owns it goes out of scope (by calling a special function "drop").
 
 // -------------------------------------------------------------------------------------------------

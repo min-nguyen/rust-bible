@@ -45,4 +45,7 @@ fn data_types() {
   let element = arr[index];                                       // terminates program eearly if index > arr.leng().
   println!("The value of the element at index {index} is: {element}"); // does not print if index > arr.len()
 
+  // ### Mutable data
+  // In Rust, mutability is always inherited. There is no intrinsic notion of mutability in the definitions of datatypes.
+  // Hence, all components of a datatype inherit the mutability of the whole data type, which is decided by the owner that creates that data.
 }

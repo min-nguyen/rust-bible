@@ -53,6 +53,34 @@ fn vecslice_example() {
 //    vec is now a value of the shape { ptr: ..., len: 5, capacity: .... } that points to an vector on the heap.
 //    vec_ref, slice, and wholeslice, follow the same format as before in the stack-allocated example.
 
+//  STACK:
+// +------------------------------------+
+// | Stack Frame: slice_example         |
+// +------------------------------------+
+// | vec: Vec { ptr: 0x1234,            |  <--- vec owns the heap-allocated data
+// |            len: 5,                 |
+// |            capacity:.., }          |
+// +------------------------------------+
+// | vec_ref:  0x7ffeefbff4a0           |  <--- `vec_ref` is a reference to the vector.
+// |    (address = 0x7ffeefbff4b4)      |
+// +------------------------------------+
+// | slice: { ptr: 0x7ffeefbff4a4,      |  <--- `slice` is a slice reference to an vector portion starting `vec[1]` to `vec[3]`.
+// |          len: 3 }                  |
+// |    (address = 0x7ffeefbff4bc)      |
+// +------------------------------------+
+// | wholeslice: { ptr: 0x7ffeefbff4a0, |  <--- `wholeslice` is a slice reference to the entire vector portion starting `vec[0]` to `vec[4]`.
+// |               len: 5 }             |
+// |    (address = 0x7ffeefbff4c4)      |
+// +------------------------------------+
+//  HEAP:
+// +------------------------------------+
+// | 0x1234: 1                          |  <---
+// +------------------------------------+     |
+// | ....                               |     |----heap-allocated vec
+// +------------------------------------+     |
+// | 0x124C: 5                          |  <---
+// +------------------------------------+
+
 
 // --------------------------------------------------------------------------------
 // ## STRING SLICES (&str)

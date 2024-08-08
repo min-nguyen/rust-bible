@@ -52,27 +52,31 @@ fn ref_heap() {
 // -------------------------------------------------------------------
 // # SHARED VS MUTABLE REFERENCES
 // There are two types of References:
-//    1. Shared References (&). There can be as many of these
-//    2. Mutable References (mut &)
+//    1. Shared References (&). This is read-only access. There can be many of these used in the same scope while the referenced data is not changed.
+//    2. Mutable References (mut &). This is write and read access. While one is being used in scope, no other references can be used.
 // To access the underlying value, you can either:
 //    1. Explicitly dereference it, which you write as *x.
 //    2. Let the Rust compiler automatically redeference the reference, where you using it directly as x
 // At any given time, you can have either one mutable reference or any number of immutable references.
 
 // ## SHARED REFERENCES (borrowing)
-// A shared reference (&x) can only read from the value it indirectly points to.
-fn reference_example_1() {
+// A shared reference (ref : &T = &x) can only read from the value it indirectly points to.
+// Shared references have some rules:
+// 1. While a shared reference is in scope, the referenced data cannot change.
+//    A reference's scope begins from when it is declared until the last time it is used.
+//    In other words, only one variable may actively refer to a value while it is being mutated.
+fn shared_reference_example_1() {
     // Create a variable x
     let x: u32 = 10;
     // Create a reference to it
-    let ref_x: &u32 = &x;
+    let (ref_x, ref_y) : (&u32, &u32) = (&x, &x);
     // Explicitly deference and print out the value
     println!("x = {}", *ref_x);
     // Implicitly deference and print out the value
-    println!("x = {}",  ref_x);
+    println!("x = {}",  ref_y);
 }
 
-fn reference_example_2() {
+fn shared_reference_example_2() {
     fn calculate_length(ref_s: &String) -> usize { // s is a reference to a String
         (*ref_s).len();  // Explicitly dereference it from &String to String to call the len() method.
         ref_s.len()      // Implicitly dereference it from &String to String to call the len() method.
@@ -84,19 +88,19 @@ fn reference_example_2() {
 }
 
 // ## MUTABLE REFERENCES (mutable borrowing)
-// A mutable reference (&mut) is allowed to mutate the value that it indirectly points to (not the address of the OWNER it points to).
+// A mutable reference (ref : &mut T = &mut x) is allowed to mutate the value that it indirectly points to (not the address of the OWNER it points to).
 // Mutable references have some rules:
 //  1. Only mutable variables can have mutable references.
 //     This makes sense: if the original owner is not able to change its data, then neither should any references to that data.
-//  2. While a mutable reference is in scope, no new references can be declared, and no existing references (inc. the owner) can be used.
+//  2. While a mutable reference is in scope, no existing references (inc. the owner) can be used, and no new references can be declared
 //     A reference's scope begins from when it is declared until the last time it is used.
-//     In other words, only one variable may actively refer to a value.
+//     In other words, only one variable may actively refer to a value while it is being mutated.
 fn mut_reference_example() {
     // mutable owner
     let mut s = String::from("hello");
 
     // mutable reference ref1_s is in scope
-    let ref1  = &mut s;
+    let ref1: &mut String  = &mut s;
     // let iref1 = &s;   <-- Not allowed, as ref1 is still being used
     // s.push_str("s");  <-- Not allowed, as ref1 is still being used
     ref1.push_str("s");
@@ -111,10 +115,11 @@ fn mut_reference_example() {
     s.push_str("s");
 }
 
+// ## OTHER COMBINATIONS
 // As variables can be references, we can also have combinations of (im)mutable variables that are (im)mutable references.
-//   - `y: &i32`: Immutable variable y is an immutable reference to an i32 value.
+//   - `y: &i32`: y is a shared reference to an i32 value.
 //     You're not allowed to change anything.
-//   - `mut y: &i32`: Mutable variable y is an immutable reference to an i32 value.
+//   - `mut y: &i32`: y is a mutable reference to an i32 value.
 //     You're allowed to point y at a new memory location but not to change the contents of the memory it's pointing at.
 //   - `y: &mut i32`: Immutable variable y is a mutable reference to an i32 value.
 //     You're allowed to modify the contents of the memory y is pointing at, but not to change where it's pointing.

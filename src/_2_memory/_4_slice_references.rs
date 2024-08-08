@@ -7,7 +7,7 @@
 // By including the slice length in the reference, this lets us talk about part of a data and give our reference a known size to refer to, while allowing the size of the slice reference type itself to be known.
 
 // A SLICE REFERENCE to STACK-ALLOCATED data:
-fn slice_example() {
+fn arrslice_example() {
   let arr: [i32; 5] = [1, 2, 3, 4, 5]; // An array stored on the stack
   let arr_ref: &[i32; 5] = &arr;       // A normal reference to all of the array.
                                        // Its type includes the array's length, determined at compile-time.
@@ -38,6 +38,20 @@ fn slice_example() {
 // |               len: 5 }             |
 // |    (address = 0x7ffeefbff4c4)      |
 // +------------------------------------+
+
+// A SLICE REFERENCE to HEAP-ALLOCATED data:
+fn vecslice_example() {
+  let vec: Vec<i32> = vec![1, 2, 3, 4, 5]; // An vector stored on the heap
+  let vec_ref: &Vec<i32>  = &vec;          // A normal reference to all of the vector.
+                                           // Its value includes the vector's length, determined at run-time.
+  let slice: &[i32] = &vec[1..4];          // A slice reference to part of the vector (elements 2, 3, and 4),
+                                           // Its value includes the slice's length, determined at run time.
+  let wholeslice: &[i32] = &vec[..];       // A slice reference to all of the vector
+                                           // Its value includes the slice's length, determined at run time.
+}
+// A reference to a slice allocated on the heap is the same concept above, except:
+//    vec is a value of the shape { ptr: ..., len: 5, capacity: .... } that points to an vector on the heap.
+
 
 // --------------------------------------------------------------------------------
 // ## STRING SLICES (&str)

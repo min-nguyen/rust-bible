@@ -115,16 +115,33 @@ fn mut_reference_example() {
     s.push_str("s");
 }
 
-// ## OTHER COMBINATIONS
-// As variables can be references, we can also have combinations of (im)mutable variables that are (im)mutable references.
-//   - `y: &i32`: y is a shared reference to an i32 value.
-//     You're not allowed to change anything.
-//   - `mut y: &i32`: y is a mutable reference to an i32 value.
-//     You're allowed to point y at a new memory location but not to change the contents of the memory it's pointing at.
-//   - `y: &mut i32`: Immutable variable y is a mutable reference to an i32 value.
-//     You're allowed to modify the contents of the memory y is pointing at, but not to change where it's pointing.
-//   - `mut y: &mut i32`: Mutable variable y is a mutable reference to an i32 value.
-//     You're allowed to modify the memory y is pointing at or to point y at a new location.
+// ## COMBINATIONS OF (IM)MUTABLE VARIABLES THAT ARE (IM)MUTABLE REFERENCES
+// As variables themselves can be mutable, we can also have combinations of (im)mutable variables that are (im)mutable references.
+// In other words, as well as modifying the referenced value, it is possible to modify what a reference points to.
+fn mutability_in_references(){
+    let mut x : i32 = 2;
+
+    // r1 is a constant variable that is a shared reference to a (possibly mutable or immutable) i32 value.
+    // You're not allowed to change what r1 points to, nor the content of the memory r1 points to.
+    let r1 : &i32 = &x;
+
+    // r2 is a mutable variable that is a shared reference to a (possibly mutable or immutable) i32 value.
+    // You can point r2 to a new memory location, but you can't change the context of the memory r2 points to.
+    let mut r2 : &i32 = &x;
+    r2 = &5;
+
+    // r3 is a constant variable that is a mutable reference to a (necessarily mutable) i32 value.
+    // You can change the contents of the memory r2 points to, but you can't change where r2 is pointing.
+    let r3: &mut i32 = &mut x;
+
+    // r4 is a mutable variable that is a mutable reference to a (necessarily mutable) i32 value.
+    // You can point r4 to a new memory location, and you can change the contents of the memory r4 points at.
+    let mut r4: &mut i32 = &mut x;
+    let mut y: i32 =  6;
+    r4 = &mut y;
+    *r4  = 5;
+}
+
 
 // -------------------------------------------------------------------
 // ## DIFFERENCE BETWEEN REFERENCES AND POINTERS

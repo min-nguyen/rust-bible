@@ -50,10 +50,8 @@ fn structs_usage(){
 
   // Creating a mutable struct instance
   let mut user1 = User {
-    active: true,
-    sign_in_count: 1,
-    username: String::from("someusername123"),
-    email: String::from("someone@example.com"),
+    active: true,  sign_in_count: 1,
+    username: String::from("someusername123"), email: String::from("someone@example.com"),
   };
   // Accessing a field
   let b = user1.active;
@@ -63,16 +61,14 @@ fn structs_usage(){
   // Syntax sugar: assigning fields with function arguments:
   fn build_user(email_: String, username: String) -> User {
       User {
-          active: true,
-          sign_in_count: 1,
+          active: true,  sign_in_count: 1,
           email: email_,    // we can explicitly assign the argument to the field
           username,         // or implicitly assign it if the argument matches the field name
       }
   }
   // Syntax sugar: reusing only parts of structs.
   let user2: User = User {
-      username: String::from("another@example.com"),
-      email: String::from("another@example.com"),
+      username: String::from("anotherexample"),
       ..
       user1
   };

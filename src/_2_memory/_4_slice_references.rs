@@ -49,8 +49,9 @@ fn vecslice_example() {
   let wholeslice: &[i32] = &vec[..];       // A slice reference to all of the vector
                                            // Its value includes the slice's length, determined at run time.
 }
-// A reference to a slice allocated on the heap is the same concept above, except:
-//    vec is a value of the shape { ptr: ..., len: 5, capacity: .... } that points to an vector on the heap.
+// A slice reference to heap-allocated data is similar to above for stack-allocated data, except:
+//    vec is now a value of the shape { ptr: ..., len: 5, capacity: .... } that points to an vector on the heap.
+//    vec_ref, slice, and wholeslice, follow the same format as before in the stack-allocated example.
 
 
 // --------------------------------------------------------------------------------

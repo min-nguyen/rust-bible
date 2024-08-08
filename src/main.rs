@@ -11,7 +11,8 @@ mod _2_memory {
     mod _4_slice_references;
 }
 mod _3_structured_data {
-    mod _1_structs;
+    mod _1_struct_memory_layout;
+    mod _2_struct_ownership;
 }
 
 // mod submodule2;

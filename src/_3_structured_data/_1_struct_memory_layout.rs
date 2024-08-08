@@ -1,7 +1,5 @@
 // -----------------------------------------------
-// # STRUCTS
-
-// ## DEFINING AND REPRESENTING STRUCTS.
+// # STRUCTS: MEMORY LAYOUT
 // A STRUCT is represented in memory as a contiguous sequence of its field values whose types, in turn, determine their own memory representation.
 //   Fields that can be allocated on the stack are done so like normal, represented on the stack directly by their data.
 //   Fields that must be allocated on the heap are done so like normal, represented on the stack as references to that data on the heap.
@@ -19,27 +17,27 @@ fn struct_repr(){
     username: String::from("someusername123"),  // Underlying data stored on heap
     email: String::from("someone@example.com"), // Underlying data stored on heap
   };
-  // Stack (user1):
-  // +--------------------------------------------------+
-  // | active            | true                         | 1 byte
-  // +--------------------------------------------------+
-  // | padding           | 0x00 00 00 00 00 00          | 7 bytes (padding for alignment)
-  // +--------------------------------------------------+
-  // | sign_in_count     | 1                            | 8 bytes
-  // +--------------------------------------------------+
-  // | username          | {ptr=0x1234, len=17, cap=17} | 24 bytes
-  // +--------------------------------------------------+
-  // | email.ptr         | {ptr=0x2234, len=20, cap=20} | 24 bytes
-  // +--------------------------------------------------+
-  // Heap:
-  // +---------------------------------------------------+
-  // | 0x1234            | "someusername123" (username)  | 17 bytes + 1 null terminator
-  // +---------------------------------------------------+
-  // + ...               | ...                           +
-  // +---------------------------------------------------+
-  // | 0x2234            | "someone@example.com" (email) | 20 bytes + 1 null terminator
-  // +---------------------------------------------------+
 }
+// Stack (user1):
+// +--------------------------------------------------+
+// | active            | true                         | 1 byte
+// +--------------------------------------------------+
+// | padding           | 0x00 00 00 00 00 00          | 7 bytes (padding for alignment)
+// +--------------------------------------------------+
+// | sign_in_count     | 1                            | 8 bytes
+// +--------------------------------------------------+
+// | username          | {ptr=0x1234, len=17, cap=17} | 24 bytes
+// +--------------------------------------------------+
+// | email.ptr         | {ptr=0x2234, len=20, cap=20} | 24 bytes
+// +--------------------------------------------------+
+// Heap:
+// +---------------------------------------------------+
+// | 0x1234            | "someusername123" (username)  | 17 bytes + 1 null terminator
+// +---------------------------------------------------+
+// + ...               | ...                           +
+// +---------------------------------------------------+
+// | 0x2234            | "someone@example.com" (email) | 20 bytes + 1 null terminator
+// +---------------------------------------------------+
 
 // ## USING STRUCTS
 fn structs_usage(){

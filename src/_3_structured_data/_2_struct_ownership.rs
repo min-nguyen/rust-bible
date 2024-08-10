@@ -7,10 +7,14 @@ struct User {
 }
 // ## OWNERSHIP TRANSFER in STRUCTS: Copying, Moving, and Cloning Structs
 // When transferring a struct from one variable to another:
-// If a struct contains only stack-allocated types that implement the Copy trait, the struct itself can be copied rather than moved.
-//   So the original variable remains valid.
-// If a struct contains heap-allocated types, the entire struct including all its fields are moved.
-//   So the original variable becomes invalid.
+
+   TO DO: SOME RULES.
+
+
+            // If a struct contains only stack-allocated types that implement the Copy trait, the struct itself can be copied rather than moved.
+            //   So the original variable remains valid.
+            // If a struct contains heap-allocated types, the entire struct including all its fields are moved.
+            //   So the original variable becomes invalid.
 
 fn structs_ownership(){
   // user1 owns the

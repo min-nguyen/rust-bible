@@ -56,11 +56,30 @@ fn variable_scope(){ // A stack frame that allocates memory for local variable s
 
 // -------------------------------------------------------------------------------------------------
 // ### OWNERSHIP TRANSFER : Copying, Moving, and Cloning Data
+// Variables are always stored on the stack, and may further point to data on the heap.
+// When transferring a value from one variable to another:
 
-// [COPY]: Stack-Only Data
-//   When assigning new variables to static data that is already stored on the stack, we can simply copy that data.
-//   This is called a COPY.
-//   (In contrast to assigning ownership for dynamic data, there is no difference between deep and shallow copying here).
+   TO DO: SOME RULES.
+
+//    ........
+
+
+// [MOVE]: Both Stack and Heap Data
+// By default, transferring a value from one variable to another is called a MOVE.
+// That value is copied on the stack, but the original variable is invalidated.
+// Any heap data that the value refers to is not copied.
+fn move_data(){ // A stack frame that allocates memory for local variables s1 and s2 is created.
+    {
+        // Create an owner s1 of type String whose value points to data "hello" newly allocated on the heap, and push s1 onto the stack.
+        let s1: String = String::from("hello");   // <<-- s1 is valid
+        // Move the value of s1 to a new owner s2, and push s2 onto the stack. We do not copy the data on the heap that is pointed to.
+        let s2: String = s1;                      // <<-- s2 is now valid and s1 is no longer valid
+    } // <<-- s2 is no longer valid, so we free the memory it points to on the heap .
+}
+
+// [COPY] Stack-Only Data
+// Transferring a value that implements the COPY trait to another variable, is called a COPY.
+// That value is copied on the stack, and the original variable remains valid.
 fn copy_static_data(){ // A stack frame that allocates memory for local variables x and y is created.
     {
         // Create an owner x whose value is 5, and push onto the stack
@@ -81,20 +100,9 @@ fn copy_static_data(){ // A stack frame that allocates memory for local variable
     //      Character types, char.
     //      Tuples if they only contain types that also implement Copy.
 
-// [MOVE]: Heap-Only Data
-//   When assigning new variables to dynamic data that is already stored on the heap, we perform a "shallow copy".
-//   This is called a MOVE.
-fn move_dynamic_data(){ // A stack frame that allocates memory for local variables s1 and s2 is created.
-    {
-        // Create an owner s1 of type String whose value points to data "hello" newly allocated on the heap, and push s1 onto the stack.
-        let s1: String = String::from("hello");   // <<-- s1 is valid
-        // Move the value of s1 to a new owner s2, and push s2 onto the stack. We do not copy the data on the heap that is pointed to.
-        let s2: String = s1;                      // <<-- s2 is now valid and s1 is no longer valid
-    } // <<-- s2 is no longer valid, so we free the memory it points to on the heap .
-}
-
 // [CLONE]: Heap-Only Data
-//   If we _do_ want to actually copy heap data when assigning new variables to it, we perform a "deep copy".
+// Transferring a value that refers to heap data.
+// If we do_ want to actually copy heap data when assigning new variables to it, we perform a "deep copy".
 //   This is called a CLONE.
 fn clone_dynamic_data(){  // A stack frame that allocates memory for local variables s1 and s2 is created.
     {

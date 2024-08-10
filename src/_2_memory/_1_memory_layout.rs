@@ -5,7 +5,11 @@
 
 // ## Kernel Virtual Memory Space
 // This is the segment of virtual memory reserved for the OS kernel. It allows the OS to present the computer's physical memory to programs as a large and contiguous block of memory. The OS keeps track of the memory pages that are currently being used by the kernel and those that are available for use by programs. It also maps physical memory addresses to virtual memory addresses to access hardware devices and other system resources.
-// An program is typically provided the following virtual memory model.
+
+// Memory addresses increase in bytes.
+// For example, if an address 0x7ffeefbff4a0 is incremented by 1 byte, the next address would be 0x7ffeefbff4a1.
+
+// A program is typically provided the following virtual memory model.
 // +-------------------------------+
 // |                               |
 // |           Stack               |   <-- Managed by OS at runtime

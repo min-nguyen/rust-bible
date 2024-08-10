@@ -1,5 +1,5 @@
 // -----------------------------------------------
-// # OWNERS AND OWNERSHIP
+// # OWNERS AND OWNERSHIP TRANSFER
 // A Variable is called an OWNER wrt to some value if it is the sole owner of that value.
 // The concept of "owning" a value does not always imply that the value is stored on the heap.
 
@@ -55,7 +55,7 @@ fn variable_scope(){ // A stack frame that allocates memory for local variable s
 }     // <<-- s is popped from stack
 
 // -------------------------------------------------------------------------------------------------
-// ### OWNERSHIP in VARIABLE ASSIGNMENTS: Copying, Moving, and Cloning Data
+// ### OWNERSHIP TRANSFER : Copying, Moving, and Cloning Data
 
 // [COPY]: Stack-Only Data
 //   When assigning new variables to static data that is already stored on the stack, we can simply copy that data.
@@ -106,7 +106,7 @@ fn clone_dynamic_data(){  // A stack frame that allocates memory for local varia
 }
 
 // -------------------------------------------------------------------
-// ### OWNERSHIP in FUNCTION CALLS
+// ### OWNERSHIP TRANSFER in FUNCTION CALLS
 // Passing a value as a function argument will transfer ownership exactly like when a value is assigned to a variable.
 //   It will either 1) MOVE (for variables that own values on the stack pointing to heap-data)
 //               or 2) COPY (for variables that own basic values on the stack),
@@ -127,7 +127,7 @@ fn makes_copy(some_integer: i32) { // some_integer comes into scope
 } // Here, some_integer goes out of scope. Nothing special happens.
 
 // -------------------------------------------------------------------
-// ### OWNERSHIP in FUNCTION RETURNS
+// ### OWNERSHIP TRANSFER in FUNCTION RETURNS
 // Returning a value from a function can also transfer ownership.
 fn ownership_in_function_returns() {
     let s1 = gives_ownership();         // gives_ownership moves its return value into s1

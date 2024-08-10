@@ -71,37 +71,37 @@ fn _double(n: &i32) -> i32 {
     n * 2
 }
 // 1. A stack frame is created for the main() function and the stack pointer is updated to point to the new stack frame. The local variable x is stored in the stack frame, and local variable y is a reference to x (points to x's address).
-//    +----------------------------+  \
-//    | Stack Frame: _main ()      |  |
-//    +----------------------------+  |
-//    | x : 48                     |  |
-//    +----------------------------+  |
-//    | y : 0x7ffeefbff4a0         |  |- STACK
-//    +----------------------------+  |
+// +----------------------------------------+
+// | Stack Frame: _main()                   |
+// +----------------------------------------+ 0x7ffeefbff4a0
+// | x: 48                                  |  <--- `x` stores the value `48`.
+// +----------------------------------------+ 0x7ffeefbff4a4
+// | y: 0x7ffeefbff4a0                      |  <--- `y` is a reference to `x` (points to `x`'s address).
+// +----------------------------------------+
 // 2. When the function double() is called, the return address is stored in the stack, and a new stack frame is created for the double() function.  The parameter n is stored in the stack frame for the double() function. The stack pointer is updated to point to the new stack frame, but the change in the stack pointer depends on the size of the function arguments and local variables.
-//    +----------------------------+  \
-//    | Stack Frame: _main ()      |  |
-//    +----------------------------+  |
-//    | x : 48                     |  |
-//    +----------------------------+  |
-//    | y : 0x7ffeefbff4a0         |  |- STACK
-//    +----------------------------+  |
-//    | Return Address: _main()    |  |
-//    +----------------------------+  |
-//    | Stack Frame: _double ()    |  |
-//    +----------------------------+  |
-//    | n : 0x7ffeefbff4a0         |  |
-//    +----------------------------+  |
+// +----------------------------------------+
+// | Stack Frame: _main()                   |
+// +----------------------------------------+ 0x7ffeefbff4a0
+// | x: 48                                  |  <--- `x` stores the value `48`.
+// +----------------------------------------+ 0x7ffeefbff4a4
+// | y: 0x7ffeefbff4a0                      |  <--- `y` is a reference to `x` (points to `x`'s address).
+// +----------------------------------------+ 0x7ffeefbff4a8
+// | Return Address: _main()                |  <--- The return address in the text (code) segment for when `_double` completes.
+// +----------------------------------------+
+// | Stack Frame: _double()                 |
+// +----------------------------------------+ 0x7ffeefbff4b0
+// | n: 0x7ffeefbff4a0                      |  <--- `n` is a reference to `x` (points to `x`'s address).
+// +----------------------------------------+
 // 3. The double() function terminates and the operating system deallocates the stack frame for the double() function. The stack pointer is updated to point to the previous stack frame, and the return value is stored in the variable z in the main() function. The main() function ends and the whole program terminates.
-//    +----------------------------+  \
-//    | Stack Frame: _main ()      |  |
-//    +----------------------------+  |
-//    | x : 48                     |  |
-//    +----------------------------+  |
-//    | y : 0x7ffeefbff4a0         |  |- STACK
-//    +----------------------------+  |
-//    | z : 66                     |  |
-//    +----------------------------+  |
+// +----------------------------------------+
+// | Stack Frame: _main()                   |
+// +----------------------------------------+ 0x7ffeefbff4a0
+// | x: 48                                  |  <--- `x` stores the value `48`.
+// +----------------------------------------+ 0x7ffeefbff4a4
+// | y: 0x7ffeefbff4a0                      |  <--- `y` is a reference to `x` (points to `x`'s address).
+// +----------------------------------------+ 0x7ffeefbff4a8
+// | z: 96                                  |  <--- `z` stores the result of `_double(y)`, which is `96`.
+// +----------------------------------------+
 
 // -------------------------------------------------------------------------------------------------
 // ### Heap

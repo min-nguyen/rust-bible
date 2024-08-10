@@ -14,40 +14,40 @@ fn ref_stack() {
     let y = &x; // y is a reference to x
     let z = &7; // 7 is a temporary integer (not owned by any variable) stored on the stack
 }
-//  STACK:
-// +--------------------------------+
-// | Stack Frame: owner_stack       |
-// +--------------------------------+
-// | x:  42                         |  <---  x owns the stack allocated data 42.
-// |    (address = 0x7ffeefbff4a0)  |
-// +--------------------------------+
-// | y: 0x7ffeefbff4a0              |  <---  y is a reference to x
-// +--------------------------------+
-// | z: 0x7ffeefbff4a8              |  <---  z is a reference to a temporary integer 7
-// +--------------------------------+
-// | Temporary Value: 7             |  <---   7 is a temporary integer (not owned by any variable) stored on the stack
-// |    (address = 0x7ffeefbff4a8)  |
-// +--------------------------------+
+// STACK:
+// +-----------------------------------------+
+// | Stack Frame: ref_stack                  |
+// +-----------------------------------------+ 0x7ffeefbff4a0
+// | x:  42                                  | 4 bytes (stack-allocated integer)
+// +-----------------------------------------+ 0x7ffeefbff4a4
+// | y: 0x7ffeefbff4a0                       | 8 bytes (pointer to x on stack)
+// +-----------------------------------------+ 0x7ffeefbff4ac
+// | z: 0x7ffeefbff4b4                       | 8 bytes (pointer to temporary integer on stack)
+// +-----------------------------------------+ 0x7ffeefbff4b4
+// | Temporary Value: 7                      | 4 bytes (stack-allocated integer, not owned by any variable)
+// +-----------------------------------------+
 
 // An REFERENCE to HEAP-ALLOCATED data:
 fn ref_heap() {
     let x = Box::new(42);  // x owns the heap-allocated integer
     let y = &x;           // y is a reference to x
 }
-//  STACK:
-// +--------------------------------+
-// | Stack Frame: ref_heap          |
-// +--------------------------------+
-// | x: Box { ptr: 0x1234,          |  <--- x owns the heap-allocated data
-// |          len:..,               |
-// |          capacity:.., }        |
-// +--------------------------------+
-// | y: &Box { ptr: 0x7ffeefbff4a0} |  <--- y is a reference to x
-// +--------------------------------+
+// STACK:
+// +------------------------------------------+
+// | Stack Frame: ref_heap                    |
+// +------------------------------------------+ 0x7ffeefbff4a0 <--- x owns the heap-allocated data
+// | x: Box { ptr: 0x60001234,                | 8 bytes (pointer to 42 on heap)
+// |          len: ..,                        | 8 bytes
+// |          capacity: ..,                   | 8 bytes
+// | }                                        |
+// +------------------------------------------+ 0x7ffeefbff4a8 <--- y is a reference to x
+// | y: &Box { ptr: 0x7ffeefbff4a0 }          | 8 bytes (pointer to x on stack)
+// +------------------------------------------+
 //  HEAP:
-// +--------------------------------+
-// | 0x1234: 42                     |  <--- heap-allocated integer
-// +--------------------------------+
+// +------------------------------------------+ 0x60001234
+// | 42                                       | 8 bytes
+// +------------------------------------------+
+
 
 // -------------------------------------------------------------------
 // # SHARED VS MUTABLE REFERENCES

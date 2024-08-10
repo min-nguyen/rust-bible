@@ -10,7 +10,7 @@ fn owner_stack() {
 //  STACK:
 // +--------------------------------+
 // | Stack Frame: owner_stack       |
-// +--------------------------------+
+// +--------------------------------+ 0x7ffeefbff4a0
 // | x: 42                          |  <--- x owns the stack-allocated integer
 // +--------------------------------+
 
@@ -22,17 +22,18 @@ fn owner_heap() {
     let x = Box::new(42); // x owns the heap-allocated integer
 }
 //  STACK:
-// +--------------------------------+
-// | Stack Frame: owner_heap        |
-// +--------------------------------+
-// | x: Box { ptr: 0x1234,          |  <--- x owns the heap-allocated data
-// |          len:..,               |
-// |          capacity:.., }        |
-// +--------------------------------+
-//  HEAP:
-// +--------------------------------+
-// | 0x1234: 42                     |  <--- heap-allocated integer
-// +--------------------------------+
+// +-----------------------------------------+
+// | Stack Frame: owner_heap                 |
+// +-----------------------------------------+ 0x7ffeefbff4a0 <--- x owns the heap-allocated data
+// | x: Box { ptr: 0x60001234,               | 8 bytes (reference to 42 on heap)
+// |          len: ..,                       | 8 bytes
+// |          capacity: ..,                  | 8 bytes
+// | }                                       |
+// +-----------------------------------------+
+// HEAP:
+// +-----------------------------------------+ 0x60001234
+// | 42                                      | 8 bytes
+// +-----------------------------------------+
 
 // RULES OF OWNERSHIP:
 //      1. Each value has an owner

@@ -19,24 +19,22 @@ fn arrslice_example() {
 //  STACK:
 // +------------------------------------+
 // | Stack Frame: slice_example         |
-// +------------------------------------+
+// +------------------------------------+ 0x7ffeefbff4a0
 // | arr: [1, 2, 3, 4, 5]               |  <--- `arr` is an array stored on the stack
 // |    (address = 0x7ffeefbff4a0,      |
 // |             ..,                    |
 // |             ..,                    |
 // |             ..,                    |
 // |             ..0x7ffeefbff4b3 )     |
-// +-------------------------------------+
+// +------------------------------------+ 0x7ffeefbff4b4
 // | arr_ref:  0x7ffeefbff4a0           |  <--- `arr_ref` is a reference to the array.
-// |    (address = 0x7ffeefbff4b4)      |        The length of the array is known at compile-time, and need not be stored in memory.
-// +------------------------------------+
+// |                                    |  The length of the array is known at compile-time, and need not be stored in memory.
+// +------------------------------------+ 0x7ffeefbff4bc
 // | slice: { ptr: 0x7ffeefbff4a4,      |  <--- `slice` is a slice reference to an array portion starting `arr[1]` to `arr[3]`.
 // |          len: 3 }                  |
-// |    (address = 0x7ffeefbff4bc)      |
-// +------------------------------------+
+// +------------------------------------+ 0x7ffeefbff4c4
 // | wholeslice: { ptr: 0x7ffeefbff4a0, |  <--- `wholeslice` is a slice reference to the entire array portion starting `arr[0]` to `arr[4]`.
 // |               len: 5 }             |
-// |    (address = 0x7ffeefbff4c4)      |
 // +------------------------------------+
 
 // A SLICE REFERENCE to HEAP-ALLOCATED data:
@@ -54,32 +52,41 @@ fn vecslice_example() {
 //    vec_ref, slice, and wholeslice, follow the same format as before in the stack-allocated example.
 
 //  STACK:
-// +------------------------------------+
-// | Stack Frame: slice_example         |
-// +------------------------------------+
-// | vec: Vec { ptr: 0x1234,            |  <--- vec owns the heap-allocated data
-// |            len: 5,                 |
-// |            capacity:.., }          |
-// +------------------------------------+
-// | vec_ref:  0x7ffeefbff4a0           |  <--- `vec_ref` is a reference to the vector.
-// |    (address = 0x7ffeefbff4b4)      |
-// +------------------------------------+
-// | slice: { ptr: 0x7ffeefbff4a4,      |  <--- `slice` is a slice reference to an vector portion starting `vec[1]` to `vec[3]`.
-// |          len: 3 }                  |
-// |    (address = 0x7ffeefbff4bc)      |
-// +------------------------------------+
-// | wholeslice: { ptr: 0x7ffeefbff4a0, |  <--- `wholeslice` is a slice reference to the entire vector portion starting `vec[0]` to `vec[4]`.
-// |               len: 5 }             |
-// |    (address = 0x7ffeefbff4c4)      |
-// +------------------------------------+
+// +------------------------------------------+
+// | Stack Frame: vecslice_example            |
+// +------------------------------------------+ 0x7ffeefbff498   <--- owner of heap-allocated vector
+// | vec: Vec {                               |
+// |   ptr: 0x60001234,                       | 8 bytes (pointer to vec[0] on heap)
+// |   len: 5,                                | 8 bytes
+// |   capacity: ..                           | 8 bytes
+// | }                                        |
+// +------------------------------------------+ 0x7ffeefbff4b0  <--- reference to the vector.
+// | vec_ref: &Vec {                          |
+// |   ptr: 0x7ffeefbff498                    | 8 bytes (pointer to `vec` on stack)
+// | }                                        |
+// +------------------------------------------+ 0x7ffeefbff4b8  <--- reference to the vector slice `vec[1]` to `vec[3]`.
+// | slice: {                                 |
+// |   ptr: 0x60001238,                       | 8 bytes (pointer to `vec[1]` on heap)
+// |   len: 3                                 | 8 bytes
+// | }                                        |
+// +------------------------------------------+ 0x7ffeefbff4c8 <--- reference to entire vector as a slice `vec[0]` to `vec[4]
+// | wholeslice: {                            |
+// |   ptr: 0x60001234,                       | 8 bytes (pointer to `vec[0]` on heap)
+// |   len: 5                                 | 8 bytes
+// | }                                        |
+// +------------------------------------------+ 0x7ffeefbff4d8
 //  HEAP:
-// +------------------------------------+
-// | 0x124C: 5                          |  <---
-// +------------------------------------+     |
-// | ....                               |     |--- heap-allocated vec
-// +------------------------------------+     |
-// | 0x1234: 1                          |  <---
-// +------------------------------------+
+// +------------------------------------------+ 0x60001234
+// | 1                                        | <--- vec[0]
+// +------------------------------------------+ 0x60001238
+// | 2                                        | <--- vec[1]
+// +------------------------------------------+ 0x6000123C
+// | 3                                        | <--- vec[2]
+// +------------------------------------------+ 0x60001240
+// | 4                                        | <--- vec[3]
+// +------------------------------------------+ 0x60001244
+// | 5                                        | <--- vec[4]
+// +------------------------------------------+
 
 // --------------------------------------------------------------------------------
 // ## STRING SLICES (&str)

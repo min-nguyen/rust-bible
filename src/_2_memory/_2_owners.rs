@@ -146,8 +146,7 @@ fn clone_dynamic_data(){  // A stack frame that allocates memory for local varia
 // -------------------------------------------------------------------
 // ## OWNERSHIP TRANSFER in FUNCTION CALLS
 // Passing a value as a function argument will transfer ownership exactly like when a value is assigned to a variable.
-//   It will either 1) MOVE (for variables that own values on the stack pointing to heap-data)
-//               or 2) COPY (for variables that own basic values on the stack),
+//   It will either MOVE or COPY, depending on whether the value implements the Copy trait.
 fn ownership_in_function_calls() {
   let s: String = String::from("hello"); // s is in scope
   takes_ownership(s);       // s's value, a  on the stack that points to heap-data, is MOVED to a new variable "some_string"

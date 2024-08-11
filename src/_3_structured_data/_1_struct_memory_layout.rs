@@ -75,8 +75,3 @@ fn structs_usage(){
       user1
   };
 }
-
-// ## STRUCT OWNERSHIP in VARIABLE ASSIGNMENTS: Copying, Moving, and Cloning Structs
-fn structs_ownership(){
-
-}

@@ -1,51 +1,50 @@
 // -----------------------------------------------
-// # OWNERS AND OWNERSHIP TRANSFER
-// A Variable is called an OWNER wrt to some value if it is the sole owner of that value.
-// The concept of "owning" a value does not always imply that the value is stored on the heap.
+// # OWNERS
+//
+// A Variable is called an OWNER wrt to some value on the stack or heap if it is the sole owner of that value.
+// The rules of ownership are as follow:
+//  1. Each value has an owner
+//  2. There can only be one owner at a time
+//  3. When the owner goes out of scope, the value is dropped
 
-// An OWNER (variable) of STACK-ALLOCATED data is simply that data itself:
+// An OWNER of stack-allocated data is represented on the stack as that data directly.
 fn owner_stack() {
-    let x = 42; // x owns the stack-allocated integer
+  let x = 42; // x owns the stack-allocated integer
 }
-//  STACK:
-// +--------------------------------+
-// | Stack Frame: owner_stack       |
-// +--------------------------------+ 0x7ffeefbff4a0
-// | x: 42                          |  <--- x owns the stack-allocated integer
-// +--------------------------------+
+  //  STACK:
+  // +--------------------------------+
+  // | Stack Frame: owner_stack       |
+  // +--------------------------------+ 0x7ffeefbff4a0
+  // | x: 42                          |  <--- x owns the stack-allocated integer
+  // +--------------------------------+
 
-// An OWNER (variable) of HEAP-ALLOCATED data is represented in the stack as three parts:
-//    1. a pointer to the heap memory holding the contents of the data
-//    2. a length
-//    3. a capacity being the total amount of heap memory
+// An OWNER of heap-allocated data is represented on the stack as a pointer to that heap data.
+// The owner has three parts:
+  // 1. a pointer to the heap memory holding the contents of the data
+  // 2. a length
+  // 3. a capacity being the total amount of heap memory
 fn owner_heap() {
-    let x = Box::new(42); // x owns the heap-allocated integer
+  let x = Box::new(42); // x owns the heap-allocated integer
 }
-//  STACK:
-// +-----------------------------------------+
-// | Stack Frame: owner_heap                 |
-// +-----------------------------------------+ 0x7ffeefbff4a0 <--- x owns the heap-allocated data
-// | x: Box { ptr: 0x60001234,               | 8 bytes (reference to 42 on heap)
-// |          len: ..,                       | 8 bytes
-// |          capacity: ..,                  | 8 bytes
-// | }                                       |
-// +-----------------------------------------+
-// HEAP:
-// +-----------------------------------------+ 0x60001234
-// | 42                                      | 8 bytes
-// +-----------------------------------------+
-
-// RULES OF OWNERSHIP:
-//      1. Each value has an owner
-//      2. There can only be one owner at a time
-//      3. When the owner goes out of scope, the value is dropped
-// The point of ownership is to keep track of what code is using what data on the heap, minimize duplicate data on the heap, and clean up unused data on the heap.
-// To support this, each runtime request for memory allocation must be paired with exactly one free which returns the memory when we’re done with it.
-// In Rust, memory is automatically freed once the variable that owns it goes out of scope (by calling a special function "drop").
+  // STACK:
+  // +-----------------------------------------+
+  // | Stack Frame: owner_heap                 |
+  // +-----------------------------------------+ 0x7ffeefbff4a0 <--- x owns the heap-allocated data
+  // | x: Box { ptr: 0x60001234,               | 8 bytes (reference to 42 on heap)
+  // |          len: ..,                       | 8 bytes
+  // |          capacity: ..,                  | 8 bytes
+  // | }                                       |
+  // +-----------------------------------------+
+  // HEAP:
+  // +-----------------------------------------+ 0x60001234
+  // | 42                                      | 8 bytes
+  // +-----------------------------------------+
 
 // -------------------------------------------------------------------------------------------------
-// ### VARIABLE SCOPE
-
+// ## Ownership Scope:
+//
+// Each runtime request for memory allocation must be paired with exactly one free which returns the memory when we’re done with it.
+// In Rust, memory is automatically freed once the variable that owns it goes out of scope (by calling a special function "drop").
 fn variable_scope(){ // A stack frame that allocates memory for local variable s.
   {
       // A variable of type String is an owner of a dynamic, growable string stored in the heap-allocated buffer.
@@ -55,19 +54,66 @@ fn variable_scope(){ // A stack frame that allocates memory for local variable s
 }     // <<-- s is popped from stack
 
 // -------------------------------------------------------------------------------------------------
-// ### OWNERSHIP TRANSFER : Copying, Moving, and Cloning Data
-// Variables are always stored on the stack, and may further point to data on the heap.
-// When transferring a value from one variable to another:
+// ## Ownership Transfer: Moving, Copying, and Cloning Data
+//
+// When assigning (=) a value from one variable to another, the transfer can be considered a MOVE, COPY, or CLONE.
+// depending on the type of value being assigned.
+//
+//       a. A MOVE (of ownership) happens by default unless the assigned value implements the Copy trait.
+//          On the stack, the value stored in the original variable is "moved" to the new variable.
+//          If the value involves heap data through a pointer, the heap data is not duplicated.
+//          The original variable is invalidated, and the new variable is now the owner of that data.
+//       b. A COPY happens if the assigned value implements the Copy trait. This only applies to values that don't involve heap allocation.
+//          On the stack, the value stored in the original variable is "copied" to the new variable.
+//          Since the Copy trait is only implemented for types not involving heap data, so heap data is duplicated.
+//          Both the original and new variables remain valid, and they each own independent copies of the same data on the stack.
+//       c. A CLONE happens if the assigned value is a result of clone(). This only applies to values that involve heap allocation.
+//          On the stack, the value stored in the original variable is "copied" to the new variable, but points to a newly allocated region on the heap.
+//          On the heap, the data that the value pointed to is copied to the new region.
+//          Both the original and new variables remain valid, and they each own independent copies of the same data on the heap.
 
-   TO DO: SOME RULES.
+// -------------------------------------------------------------------------------------------------
+// ## An important note about Ownership Transfer in practice.
+//
+// Ownership transfer is an abstract concept, and it is not usually productive to think of how it happens in memory.
+// That is, transferring ownership doesn't necessarily do anything in memory at all.
+// Semantically, all MOVE, COPY, and CLONE perform a memcpy i.e. an actual copy in memory.
+// In practice, a memcpy won't happen unless necessary, and the optimiser can do anything as long as it does not change the behaviour of your program.
+//
+//  - A MOVE may or may not copy the same value on the stack.
+      // - For example, below COULD produce two copies of USER on the stack.
+                        // struct User {
+                        //   active: bool,
+                        //   sign_in_count: u64,
+                        // }
+                        // fn structs_ownership(){
+                        //   let user1 = User {
+                        //     active: true,
+                        //     sign_in_count: 1,
+                        //   };
+                        //   let user2 = user1;
+                        // }
+/// - A COPY may or may not copy the same value on the stack.
+            // - For example, below COULD reduce to one user on the stack, and both `user2` and `user1` refer to the same address on the stack
+                        // #[derive(Clone, Copy)]
+                        // struct User {
+                        //   active: bool,
+                        //   sign_in_count: u64,
+                        // }
+                        // fn structs_ownership(){
+                        //   let user1 = User {
+                        //     active: true,
+                        //     sign_in_count: 1,
+                        //   };
+                        //   let user2 = user1;
+                        // }
+/// - A CLONE may or may not copy the same value on the heap, and may or may not copy the same value on the heap.
+///
+// Having a mental model where every copy is a new value stored is fine, as long as you don't use this mental model to reason about performance.
 
-//    ........
 
-
+// -------------------------------------------------------------------------------------------------
 // [MOVE]: Both Stack and Heap Data
-// By default, transferring a value from one variable to another is called a MOVE.
-// That value is copied on the stack, but the original variable is invalidated.
-// Any heap data that the value refers to is not copied.
 fn move_data(){ // A stack frame that allocates memory for local variables s1 and s2 is created.
     {
         // Create an owner s1 of type String whose value points to data "hello" newly allocated on the heap, and push s1 onto the stack.
@@ -78,8 +124,6 @@ fn move_data(){ // A stack frame that allocates memory for local variables s1 an
 }
 
 // [COPY] Stack-Only Data
-// Transferring a value that implements the COPY trait to another variable, is called a COPY.
-// That value is copied on the stack, and the original variable remains valid.
 fn copy_static_data(){ // A stack frame that allocates memory for local variables x and y is created.
     {
         // Create an owner x whose value is 5, and push onto the stack
@@ -88,22 +132,8 @@ fn copy_static_data(){ // A stack frame that allocates memory for local variable
         let y: i32 = x;      // <<-- y is valid and x is still valid
     } // <<-- x and y are no longer valid, but they are still on the stack until the function exits.
 }
-    //   The Copy Trait for Stack-Only Data:
-    //    Rust has a special annotation called the Copy trait that we can place on types that are stored on the stack, as integers.
-    //    If a type implements Copy, variables that use it do not MOVE, but rather are trivially copied.
-    //    Hence, variables implementing Copy are still valid after being assigned to another variable.
-    //
-    //    Here are some types that implement Copy:
-    //      Integer types, such as u32.
-    //      Boolean type, bool, with values true and false.
-    //      Floating-point types, such as f64.
-    //      Character types, char.
-    //      Tuples if they only contain types that also implement Copy.
 
 // [CLONE]: Heap-Only Data
-// Transferring a value that refers to heap data.
-// If we do_ want to actually copy heap data when assigning new variables to it, we perform a "deep copy".
-//   This is called a CLONE.
 fn clone_dynamic_data(){  // A stack frame that allocates memory for local variables s1 and s2 is created.
     {
         // Create an owner s1 of type String whose value points to "hello" newly allocated on the heap, and push s1 onto the stack.
@@ -114,7 +144,7 @@ fn clone_dynamic_data(){  // A stack frame that allocates memory for local varia
 }
 
 // -------------------------------------------------------------------
-// ### OWNERSHIP TRANSFER in FUNCTION CALLS
+// ## OWNERSHIP TRANSFER in FUNCTION CALLS
 // Passing a value as a function argument will transfer ownership exactly like when a value is assigned to a variable.
 //   It will either 1) MOVE (for variables that own values on the stack pointing to heap-data)
 //               or 2) COPY (for variables that own basic values on the stack),

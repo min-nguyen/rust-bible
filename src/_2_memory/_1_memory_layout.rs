@@ -39,7 +39,7 @@
 // +-------------------------------+
 
 // -------------------------------------------------------------------------------------------------
-// ### Binary
+// ## Binary
 //
 //   The output of the compilation process is a binary executable, which contains machine code and sections for different types of data.
 //   It includes instructions for setting up and managing the stack and heap.
@@ -55,15 +55,16 @@
 //   - BSS (Uninitialised Static Data)
 //     This stores uninitialised static variables.
 
+
 // -------------------------------------------------------------------------------------------------
 // ### Stack
 //
 //    The Stack is a fixed size region of memory that can store values with a known size (such as pointers) at compile-time.
 //    It starts from a higher address and grows downwards towards lower addresses.
-//    It stores all local variables, functions arguments, and return addresses.
+//    It stores local variables, functions arguments, and return addresses.
 
-//    The binary’s instructions are generated to manage a stack pointer and allocate "stack frames" for function calls.
-//       1. Every function call allocates a stack frame, providing enough memory for its arguments, local variables, and return address.
+//    The binary’s instructions manage a stack pointer and allocate "stack frames" for function calls.
+//       1. Every function call uses a new stack frame that provides enough memory for its arguments, local variables, and return address.
 //       2. As variables are introduced, their data is pushed onto the stack within that function's stack frame.
 //       3. Every function exit pops all the data in the stack frame off the stack.
 
@@ -77,7 +78,7 @@ fn _main() {
 fn _double(n: &i32) -> i32 {
     n * 2
 }
-    // An Informal Mental Model (specific details are imprecise but harmless for understanding.):
+    // An Informal Mental Model of what *COULD* happen (specific details are imprecise but harmless for understanding.):
     // 1. The main() function is called.
     //    A stack frame is used for the main() function.
     //    The stack pointer is updated to point to the new stack frame.
@@ -137,7 +138,48 @@ fn _double(n: &i32) -> i32 {
 
 
 // -------------------------------------------------------------------------------------------------
-// ### Access: Stack vs Heap
+// ## Mental Model: STACK vs HEAP: What is it?
+//    https://conradludgate.com/posts/stack_heap
+//
+// In a typical application process, your application will request memory, and the operating system will provide it.
+//
+// The stack is a linear region of memory that the OS will start a process with. As the name suggests, all memory is allocated in stack order. This means that the most recently allocated value is the first value to be deallocated.
+//
+// It's not unreasonable to want some values to live longer. To support that we must allocate them elsewhere. The "heap" is for these allocations and they can be deallocated with no required order.
+
+// -------------------------------------------------------------------------------------------------
+// ## Mental Model: STACK vs HEAP: Does it matter?
+//    https://conradludgate.com/posts/stack_heap
+//
+// Stack vs heap is a tempting but wrong model when thinking about Rust types.
+//
+// Values can be stored anywhere.
+//     You cannot tell whether any type will be stored on the stack, heap or binary.
+//
+//     For example, it's possible for local variables to go on the heap
+//
+// The mental model we should have is:
+//     * All variables as simply storing a value in "memory".
+// And in addition, we need to think about:
+//     1. Whether the variable in fact points to another value
+//        i.e. Does it involve indirection?
+//     2. Whether that underlying value is owned by it
+//        i.e. Does it manage a value? (usually meaning it is on the heap but not necessarily).
+//
+// The key takeaway is:
+//    * In general, we shouldn't really worry about where things are stored since it barely makes a difference most of the time.
+//
+//      For example, we almost never care about whether something is on the stack. It can be a fact from which you draw further conclusions about what you can't do with it, but the stack does not have benefits that you can use explicitly in your program. The stack is cheaper than the heap allocator, that's all; it gets you performance, not functionality. Additionally, you can store as much data on the heap as you want, with as much indirection as you want. But if you don't have something on the stack pointing to it, you've lost it (unless its a static variable, but we'll ignore that here.)
+//
+// Hence, for the question:
+//       "Is a &str a pointer to the stack or the heap"
+// The answer is:
+//       "It is a pointer to wherever it was allocated".
+//
+//
+// -------------------------------------------------------------------------------------------------
+// ## Access: Stack vs Heap
+//
 // Stack access is faster because we never have to follow a pointer to get there, it is always relative to the top of the stack. This is true even if the data isn't always at the top:
     // 1. Local variables in a function have fixed offsets from the stack pointer or base pointer, making access straightforward and fast.
     // 2. The stack's contiguous memory layout means that when the CPU loads data from the stack into its cache, it often loads adjacent data as well,
@@ -145,6 +187,7 @@ fn _double(n: &i32) -> i32 {
 // Heap access is slower because you have to follow a pointer to get there: contemporary processors are faster if they jump around less in memory.
 
 // -------------------------------------------------------------------------------------------------
-// ### Allocation: Stack vs Heap
+// ## Allocation: Stack vs Heap
+//
 //   Stack pushing is faster because the allocator never has to search for a place to store new data; that location is always at the current stack pointer, which is trivially maintained (by simple pointer arithmetic).
 //   Heap allocation requires more work because the allocator must first find a big enough space to hold the data and then perform bookkeeping to prepare for the next allocation.

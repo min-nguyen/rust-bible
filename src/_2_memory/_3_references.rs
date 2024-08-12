@@ -1,74 +1,119 @@
 
 // -----------------------------------------------
 // # REFERENCES AND BORROWING
-// A variable is a REFERENCE to some value if it (possibly indirectly) POINTS to the OWNER of that value.
-//    This allows you to BORROW (read) that value without taking ownership of it, without making a copy,
-//    and without preventing the original owner from accessing it once you're done.
-//    Unlike a pointer, a reference is guaranteed to point to a valid value of a particular type for the life of that reference.
-// A REFERENCE is represented in the stack as just one part:
+//
+// A variable is a REFERENCE to some value if it points to the owner of that value.
+//
+// Creating a reference is called BORROWING, letting you borrow the value while:
+//    - 1) not taking ownership of it
+//    - 2) not making a copy,
+//    - 3) not preventing the original owner from accessing it when done.
+// Unlike a pointer, a reference is guaranteed to point to a valid value of a particular type for the lifetime of that reference.
+//
+// A reference is represented in memory as just one part:
 //   - { ptr : 0x... } A pointer to another variable or value.
 
-// A REFERENCE to STACK-ALLOCATED data:
-fn ref_stack() {
-    let x = 42;  // x owns the stack allocated data 42
-    let y = &x; // y is a reference to x
-    let z = &7; // 7 is a temporary integer (not owned by any variable) stored on the stack
-}
-// STACK:
-// +-----------------------------------------+
-// | Stack Frame: ref_stack                  |
-// +-----------------------------------------+ 0x7ffeefbff4a0
-// | x:  42                                  | 4 bytes (stack-allocated integer)
-// +-----------------------------------------+ 0x7ffeefbff4a4
-// | y: 0x7ffeefbff4a0                       | 8 bytes (pointer to x on stack)
-// +-----------------------------------------+ 0x7ffeefbff4ac
-// | z: 0x7ffeefbff4b4                       | 8 bytes (pointer to temporary integer on stack)
-// +-----------------------------------------+ 0x7ffeefbff4b4
-// | Temporary Value: 7                      | 4 bytes (stack-allocated integer, not owned by any variable)
-// +-----------------------------------------+
+fn refs_vs_owners() -> String{
+    // x manages a string "golly" in memory (allocated on the heap)
+    let x = String::from("golly");
+    // y refers to, and borrows the value of, a string "gosh" in memory (allocated on the heap)
+    let y = &String::from("gosh");
 
-// An REFERENCE to HEAP-ALLOCATED data:
-fn ref_heap() {
-    let x = Box::new(42);  // x owns the heap-allocated integer
-    let y = &x;           // y is a reference to x
+    // Allowed, as x manages a String so returning it will move ownership
+    return x;
+    // Not allowed, as y does not manage a String so cannot transfer ownership.
+    // The value y points to (owned by an implicit variable) is dropped when the function exit.
+    return *y;
 }
-// STACK:
-// +------------------------------------------+
-// | Stack Frame: ref_heap                    |
-// +------------------------------------------+ 0x7ffeefbff4a0 <--- x owns the heap-allocated data
-// | x: Box { ptr: 0x60001234,                | 8 bytes (pointer to 42 on heap)
-// |          len: ..,                        | 8 bytes
-// |          capacity: ..,                   | 8 bytes
-// | }                                        |
-// +------------------------------------------+ 0x7ffeefbff4a8 <--- y is a reference to x
-// | y: &Box { ptr: 0x7ffeefbff4a0 }          | 8 bytes (pointer to x on stack)
-// +------------------------------------------+
-//  HEAP:
-// +------------------------------------------+ 0x60001234
-// | 42                                       | 8 bytes
-// +------------------------------------------+
 
+fn refs_example_1(arg: &i32) -> &i32{
+    // x manages 42
+    let x = 42;
+    // y is a reference to x
+    let y = &x;
+    // z is a reference to 7, not owned by an explicit variable.
+    let z = &7;
+
+    // We cannot return a reference to a local variable owned by the current function.
+    // because the borrowed value does not live long enough.
+    // return y; // ERROR: the value that y points to is dropped when the function exits.
+
+    // We can return a reference to a variable owned outside of a function
+    // because the borrowed value has a lifetime outside of this scope.
+    return arg // Allowed!
+}
+    // An Informal Mental Model of what *COULD* happen:
+    // STACK:
+    // +-----------------------------------------+
+    // | Stack Frame: ref_stack                  |
+    // +-----------------------------------------+ 0x7ffeefbff4a0
+    // | x:  42                                  | 4 bytes (stack-allocated integer)
+    // +-----------------------------------------+ 0x7ffeefbff4a4
+    // | y: 0x7ffeefbff4a0                       | 8 bytes (pointer to x on stack)
+    // +-----------------------------------------+ 0x7ffeefbff4ac
+    // | z: 0x7ffeefbff4b4                       | 8 bytes (pointer to temporary integer on stack)
+    // +-----------------------------------------+ 0x7ffeefbff4b4
+    // | Temporary Value: 7                      | 4 bytes (stack-allocated integer, not owned by any variable)
+    // +-----------------------------------------+
+
+fn ref_example_2(arg: &Box<i32>) -> &Box<i32> {
+    // x manages 42 (allocated on the heap)
+    let x = Box::new(42);
+    // y is a reference to x
+    let y = &x;
+
+    // We cannot return a reference to a local variable owned by the current function.
+    // because the borrowed value does not live long enough.
+    // return &x; // Error
+    // return y;  // Same error
+
+    // We can return a reference to variable owned outside of a function
+    // because the borrowed value has a lifetime outside of this scope.
+    return arg;
+}
+    // An Informal Mental Model of what *COULD* happen:
+    // STACK:
+    // +------------------------------------------+
+    // | Stack Frame: ref_heap                    |
+    // +------------------------------------------+ 0x7ffeefbff4a0 <--- x owns the heap-allocated data
+    // | x: Box { ptr: 0x60001234,                | 8 bytes (pointer to 42 on heap)
+    // |          len: ..,                        | 8 bytes
+    // |          capacity: ..,                   | 8 bytes
+    // | }                                        |
+    // +------------------------------------------+ 0x7ffeefbff4a8 <--- y is a reference to x
+    // | y: &Box { ptr: 0x7ffeefbff4a0 }          | 8 bytes (pointer to x on stack)
+    // +------------------------------------------+
+    //  HEAP:
+    // +------------------------------------------+ 0x60001234
+    // | 42                                       | 8 bytes
+    // +------------------------------------------+
 
 // -------------------------------------------------------------------
 // # SHARED VS MUTABLE REFERENCES
+//
 // There are two types of References:
 //    1. Shared References (&). This is read-only access. There can be many of these used in the same scope while the referenced data is not changed.
 //    2. Mutable References (mut &). This is write and read access. While one is being used in scope, no other references can be used.
-// To access the underlying value, you can either:
+// At any given time, you can have either one mutable reference or any number of immutable references.
+//
+// Derefencing: to access the underlying value, you can either:
 //    1. Explicitly dereference it, which you write as *x.
 //    2. Let the Rust compiler automatically redeference the reference, where you using it directly as x
-// At any given time, you can have either one mutable reference or any number of immutable references.
 
+// -------------------------------------------------------------------
 // ## SHARED REFERENCES (borrowing)
-// A shared reference (ref : &T = &x) can only read from the value it indirectly points to.
-// Shared references have some rules:
-// 1. While a shared reference is in scope, the referenced data cannot change.
-//    A reference's scope begins from when it is declared until the last time it is used.
+//
+// A shared reference (ref : &T = &x) can only read from the value it borrows.
+//
+// The Rule for Shared References:
+//  * While a shared reference is valid, the referenced data cannot change.
+//    A reference's is valid from when it is declared until the last time it is used.
 //    In other words, only one variable may actively refer to a value while it is being mutated.
+
 fn shared_reference_example_1() {
-    // Create a variable x
+    // x manages a value 10
     let x: u32 = 10;
-    // Create a reference to it
+    // ref_x and ref_y are both references to, and borrow the value of, x
     let (ref_x, ref_y) : (&u32, &u32) = (&x, &x);
     // Explicitly deference and print out the value
     println!("x = {}", *ref_x);
@@ -77,17 +122,25 @@ fn shared_reference_example_1() {
 }
 
 fn shared_reference_example_2() {
-    fn calculate_length(ref_s: &String) -> usize { // s is a reference to a String
-        (*ref_s).len();  // Explicitly dereference it from &String to String to call the len() method.
-        ref_s.len()      // Implicitly dereference it from &String to String to call the len() method.
-    } // Here, s goes out of scope. But because it does not have ownership of the string data it indirectly refers to, that data is not freed.
+    fn calculate_length(ref_s: &String) -> usize {
+        // Explicitly dereference it from &String to String to call the len() method.
+        (*ref_s).len();
+        // Implicitly dereference it from &String to String to call the len() method.
+        ref_s.len()
+    } // <-- ref_s goes out of scope.
+    //       Because it does manage any data, there is nothing to free.
 
-    let s = String::from("hello");  // <<- Create an owner "s" that points to "hello" allocated on the heap
-    let len = calculate_length(&s); // <<-- Create and pass a reference "&s" that points to "s" allocated the stack.
+    // s manages the string "hello" (on the heap)
+    let s = String::from("hello");
+    // below provides a reference to s as an argument, hence borrowing s's value,
+    // and then sets len as the owner of a usize.
+    let len = calculate_length(&s);
     println!("The length of '{s}' is {len}.");
 }
 
+// -------------------------------------------------------------------
 // ## MUTABLE REFERENCES (mutable borrowing)
+//
 // A mutable reference (ref : &mut T = &mut x) is allowed to mutate the value that it indirectly points to (not the address of the OWNER it points to).
 // Mutable references have some rules:
 //  1. Only mutable variables can have mutable references.
@@ -96,10 +149,10 @@ fn shared_reference_example_2() {
 //     A reference's scope begins from when it is declared until the last time it is used.
 //     In other words, only one variable may actively refer to a value while it is being mutated.
 fn mut_reference_example() {
-    // mutable owner
+    // s is a mutable owner of "hello" in memory
     let mut s = String::from("hello");
 
-    // mutable reference ref1_s is in scope
+    // ref1_s is a mutable reference in scope
     let ref1: &mut String  = &mut s;
     // let iref1 = &s;   <-- Not allowed, as ref1 is still being used
     // s.push_str("s");  <-- Not allowed, as ref1 is still being used
@@ -115,7 +168,9 @@ fn mut_reference_example() {
     s.push_str("s");
 }
 
+// -------------------------------------------------------------------
 // ## COMBINATIONS OF (IM)MUTABLE VARIABLES THAT ARE (IM)MUTABLE REFERENCES
+//
 // As variables themselves can be mutable, we can also have combinations of (im)mutable variables that are (im)mutable references.
 // In other words, as well as modifying the referenced value, it is possible to modify what a reference points to.
 fn mutability_in_references(){

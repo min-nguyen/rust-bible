@@ -1,5 +1,5 @@
-// To build main.rs:
-// > cargo build
+// To build lib.rs:
+// > cargo build --lib
 
 mod _1_basics {
      mod _1_variables;

@@ -53,18 +53,23 @@ fn owner_heap() {
   // +-----------------------------------------+
 
 // -------------------------------------------------------------------------------------------------
-// ## Ownership Scope and Drop:
+// ## Ownership Scope and Dropping:
 //
 // Each runtime request for heap allocation must be paired with exactly one free when we’re done with it.
-// Heap memory is automatically freed once its owner goes out of scope  -- via a special function "drop".
-// Stack memory is automatically cleaned up in the same way, but no explicit "drop" operation is needed -- the stack pointer is simply moved back.
+//
+// Dropping:
+// - Heap memory is automatically freed once its owner goes out of scope.
+//   This is done via a special function "drop".
+// - Stack memory is automatically free once its owner goes out of scope, in the same way.
+//   No explicit "drop" operation is needed -- the stack pointer is simply moved back.
+//
 // Often, the scope of coincides with the "syntaxy" scope, such as the end of a block or function.
 //
 fn ownership_scope(){
     {
         // The variable s owns a string on the heap
         let s: String = String::from("hello"); // <<-- s is valid from this point forward
-    } // <<-- s is no longer valid
+    } // <<-- s goes out of scope (and is no longer valid), and its heap-data is dropped
 }
 
 // -------------------------------------------------------------------------------------------------

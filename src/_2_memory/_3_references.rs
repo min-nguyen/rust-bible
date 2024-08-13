@@ -89,82 +89,99 @@ fn ref_example_2(arg: &Box<i32>) -> &Box<i32> {
     // +------------------------------------------+
 
 // -------------------------------------------------------------------
-// # SHARED VS MUTABLE REFERENCES
+// ## Reference "Scope" and Dereferencing
 //
-// There are two types of References:
-//    1. Shared References (&). This is read-only access. There can be many of these used in the same scope while the referenced data is not changed.
-//    2. Mutable References (mut &). This is write and read access. While one is being used in scope, no other references can be used.
-// At any given time, you can have either one mutable reference or any number of immutable references.
+// Reference "Scope":
+//    A reference's "scope" is from when it is declared to the last time it is used.
+//    This term is conflated with the "scope of a variable".
 //
-// Derefencing: to access the underlying value, you can either:
-//    1. Explicitly dereference it, which you write as *x.
-//    2. Let the Rust compiler automatically redeference the reference, where you using it directly as x
+// Dereferencing: to access the underlying value of (x : &T), you can either:
+//    1. Explicitly dereference it, written as *x.
+//    2. Implicitly dereference it, using directly as x, whereby the Rust compiler automatically redeferences it.
+
+fn reference_scope_and_deferencing_example() {
+    // x refers to a value 10
+    let ref_x: &u32 = &10;     // <<-- beginning of ref_x's scope (as a reference)
+    // Explicitly deference and print out the value
+    println!("x = {}", *ref_x);
+    // Implicitly deference and print out the value
+    println!("x = {}",  ref_x); // <<-- end of ref_x'scope (as a reference)
+} // end of ref_x's scope (as a normal variable)
+
 
 // -------------------------------------------------------------------
-// ## SHARED REFERENCES (borrowing)
+// ## Shared VS Mutable References
+//
+// There are two types of References:
+//    1. Shared References (&) have read-only access.
+//    2. Mutable References (mut &) have write and read access.
+// At any given time, you can have either one mutable reference in scope or any number of immutable references in scope.
+//
+
+// -------------------------------------------------------------------
+// ### SHARED REFERENCES (borrowing)
 //
 // A shared reference (ref : &T = &x) can only read from the value it borrows.
 //
 // The Rule for Shared References:
-//  * While a shared reference is valid, the referenced data cannot change.
-//    A reference's is valid from when it is declared until the last time it is used.
-//    In other words, only one variable may actively refer to a value while it is being mutated.
+//  * While a shared reference is in scope (being used):
+//    a. a mutable reference cannot be declared
+//    b. the owner cannot change the referenced data
 
-fn shared_reference_example_1() {
-    // x manages a value 10
-    let x: u32 = 10;
-    // ref_x and ref_y are both references to, and borrow the value of, x
-    let (ref_x, ref_y) : (&u32, &u32) = (&x, &x);
-    // Explicitly deference and print out the value
-    println!("x = {}", *ref_x);
-    // Implicitly deference and print out the value
-    println!("x = {}",  ref_y);
-}
+fn shared_reference_example() {
+    // s is a mutable variable that manages the string "hello" (on the heap)
+    let mut s = String::from("hello");
 
-fn shared_reference_example_2() {
-    fn calculate_length(ref_s: &String) -> usize {
-        // Explicitly dereference it from &String to String to call the len() method.
-        (*ref_s).len();
-        // Implicitly dereference it from &String to String to call the len() method.
-        ref_s.len()
-    } // <-- ref_s goes out of scope.
-    //       Because it does manage any data, there is nothing to free.
+    // ref_s1 and ref_s2 are immutable references to s
+    let (ref_s1, ref_s2) = (&s, &s); //<<-- Start of ref_s1, ref_s2's scope.
 
-    // s manages the string "hello" (on the heap)
-    let s = String::from("hello");
-    // below provides a reference to s as an argument, hence borrowing s's value,
-    // and then sets len as the owner of a usize.
-    let len = calculate_length(&s);
-    println!("The length of '{s}' is {len}.");
+    // A mutable reference cannot be declared while ref_s1/ref_s2 in scope
+    // let mut_ref_s : &mut String = &mut s;
+
+    // The owner cannot change the referenced data while ref_s1/ref_s2 in scope
+    // s.push('h');
+
+    // Below is the last use of ref_s1 and ref_s2.
+    println!("The length of '{}' is {}."
+            , ref_s1, (*ref_s2).len()); // <<-- End of ref_s1/ref_s2's scope (as a reference)
 }
 
 // -------------------------------------------------------------------
-// ## MUTABLE REFERENCES (mutable borrowing)
+// ### MUTABLE REFERENCES (mutable borrowing)
 //
-// A mutable reference (ref : &mut T = &mut x) is allowed to mutate the value that it indirectly points to (not the address of the OWNER it points to).
-// Mutable references have some rules:
+// A mutable reference (ref : &mut T = &mut x) can mutate the value that it borrows. indirectly points to (not the address of the OWNER it points to).
+//
+// The Rules for Mutable References:
 //  1. Only mutable variables can have mutable references.
-//     This makes sense: if the original owner is not able to change its data, then neither should any references to that data.
-//  2. While a mutable reference is in scope, no existing references (inc. the owner) can be used, and no new references can be declared
-//     A reference's scope begins from when it is declared until the last time it is used.
-//     In other words, only one variable may actively refer to a value while it is being mutated.
+//     I.e. if the owner cannot modify its data, then neither can any references.
+//  2. While a mutable reference is in scope (being used):
+//     a. No new references can be declared.
+//     b. No existing references can be used.
+//     c. The owner cannot be used.
+//  In other words, only one variable may actively refer to a value while it is being mutated.
 fn mut_reference_example() {
     // s is a mutable owner of "hello" in memory
     let mut s = String::from("hello");
 
-    // ref1_s is a mutable reference in scope
-    let ref1: &mut String  = &mut s;
-    // let iref1 = &s;   <-- Not allowed, as ref1 is still being used
-    // s.push_str("s");  <-- Not allowed, as ref1 is still being used
-    ref1.push_str("s");
-    // mutable reference  ref1_s will not be used after this point
+    // immut_ref_s is an immutable reference to s
+    let immut_ref_s: &String = &s;
 
-    // mutable reference  ref2_s is in scope
-    let ref2 = &mut s;
-    ref2.push_str("s");
-    // mutable reference  ref2_s will not be used after this point
+    // mut_ref_s is a mutable reference to s
+    let mut_ref_s: &mut String  = &mut s; // <<-- mut_ref_s begins scope
 
-    // owner s can be used again
+    // No new references can be declared while mut_ref_s is in scope
+    // let new_immut_ref_s: &String = &s; // ERROR: mut_ref_s is used later
+
+    // No existing references can be used while mut_ref_s is no scope
+    // print!("{immut_ref_s}"); // ERROR: mut_ref_s is still being used
+
+    // The owner cannot be used while mut_ref_s is in scope
+    // s.push_str("s"); // ERROR: mut_ref_s is still being used
+
+    // This marks the last usage of mut_ref_s
+    // mut_ref_s.push_str("s");// <<-- mut_ref_s ends scope
+
+    // The owner s can be used again, as mut_ref_s is not used afterwards
     s.push_str("s");
 }
 
@@ -173,7 +190,7 @@ fn mut_reference_example() {
 //
 // As variables themselves can be mutable, we can also have combinations of (im)mutable variables that are (im)mutable references.
 // In other words, as well as modifying the referenced value, it is possible to modify what a reference points to.
-fn mutability_in_references(){
+fn mutable_variables_and_references(){
     let mut x : i32 = 2;
 
     // r1 is a constant variable that is a shared reference to a (possibly mutable or immutable) i32 value.
@@ -183,6 +200,7 @@ fn mutability_in_references(){
     // r2 is a mutable variable that is a shared reference to a (possibly mutable or immutable) i32 value.
     // You can point r2 to a new memory location, but you can't change the context of the memory r2 points to.
     let mut r2 : &i32 = &x;
+    print!("{r1}");
     r2 = &5;
 
     // r3 is a constant variable that is a mutable reference to a (necessarily mutable) i32 value.

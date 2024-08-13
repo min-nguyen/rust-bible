@@ -49,8 +49,13 @@ fn owner_example() {
 // -------------------------------------------------------------------------------------------------
 // ## Ownership Scope and Dropping:
 //
+// Variable Scope:
+// A local variable's scope normally coincides with the "{}" syntax, such as the end of a block or function.
+//
+// Dropping:
 // Each heap allocation must be paired with exactly one free when we’re done with it.
-// Heap memory is automatically freed once its owner goes out of scope, and is done via a special function "drop". (Often, the scope of coincides with the "{}" scope, such as the end of a block or function.)
+// Heap memory is automatically freed once its owner goes out of scope, and is done via a special function "drop".
+//
 //
 fn ownership_scope_example(){
     {

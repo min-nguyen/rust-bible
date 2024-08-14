@@ -10,7 +10,7 @@
 struct User {
   active: bool,              // active is a bool (1 byte), likely on the stack
   sign_in_count: u64,        // sign_in_count is an integer (8 bytes), likely on the stack
-  username: String,          // A heap-allocated type consisting of { ptr (8 bytes), length (8 bytes), capacity (8 bytes) }
+  username: String,          // username and email are Strings, { ptr (8 bytes), length (8 bytes), capacity (8 bytes) },
   email: String,             // A heap-allocated type consisting of { ptr (8 bytes), length (8 bytes), capacity (8 bytes) }
 }
 

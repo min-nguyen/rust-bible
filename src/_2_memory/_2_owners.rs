@@ -10,14 +10,12 @@
 //  3. Ownership Can Be Transferred (Moved).
 //     The original variable becomes invalid, and the new variable becomes the owner of the data.
 //
-// A variable that owns data means it mabages the actual value.
-// This may mean:
-//   1) It directly stores the actual value, or
-//   2) It indirectly owns the underlying value, by storing the
-//      information of wherever the value was allocated.
-//      This means it stores:
+// A variable (i.e. its value) that is an owner of some data means it manages the data.
+// This either means:
+//   1) It is that data on the stack, and hence trivially manages itself.
+//   2) It manages that data on the heap, and is an object of the form:
+        // { ptr, len, capacity }
         //  a.  A pointer to the data
-        //  and depending on the type of data, may also store:
         //  b.  A length
         //  c.  A capacity
 //
@@ -28,7 +26,7 @@ fn owner_example() {
   // y('s value) owns a Vec allocated on the heap
   let y: Vec<i32> = Vec::from([1,2,3]);
 }
-  // An Informal Mental Model of what *COULD* happen:
+  // Informal Mental Model: what *COULD* happen:
   // STACK:
   // +-----------------------------------------+
   // | Stack Frame: owner_heap                 |

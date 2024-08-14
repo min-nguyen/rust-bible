@@ -1,47 +1,43 @@
 // -----------------------------------------------
 // # STRUCTS: MEMORY LAYOUT
-// A STRUCT is represented in memory as a contiguous sequence of its field values whose types, in turn, determine their own memory representation.
-//   Fields that can be allocated on the stack are done so like normal, represented on the stack directly by their data.
-//   Fields that must be allocated on the heap are done so like normal, represented on the stack as references to that data on the heap.
+//
+// A struct is represented in memory as a contiguous sequence of its field values.
+// The type of each field determines its own memory representation.
+//
+//    As noted before [_1_memory_layout.rs], stack vs heap is a tempting but wrong model when thinking about Rust types.
+//    That is, values can be stored anywhere and it is not easy to tell whether a type will be stored on the stack, heap or binary.
+//
 struct User {
-  active: bool,              // A stack-allocated type  consisting of a single byte (1 byte).
-  sign_in_count: u64,        // A stack-allocated type  consisting of an unsigned 64-bit integer (8 bytes).
+  active: bool,              // active is a bool (1 byte), likely on the stack
+  sign_in_count: u64,        // sign_in_count is an integer (8 bytes), likely on the stack
   username: String,          // A heap-allocated type consisting of { ptr (8 bytes), length (8 bytes), capacity (8 bytes) }
   email: String,             // A heap-allocated type consisting of { ptr (8 bytes), length (8 bytes), capacity (8 bytes) }
 }
 
-fn struct_repr(){
-  let user1 = User {
-    active: true,            // Underlying data stored on stack
-    sign_in_count: 1,        // Underlying data stored on stack
-    username: String::from("someusername123"),  // Underlying data stored on heap
-    email: String::from("someone@example.com"), // Underlying data stored on heap
-  };
-}
-// Stack (user1):
-// +--------------------------------------------------+ 0x7ffdf000
-// | active         : true                            | 1 byte
-// +--------------------------------------------------+ 0x7ffdf001
-// | padding        : 0x00 00 00 00 00 00             | 7 bytes (padding for alignment)
-// +--------------------------------------------------+ 0x7ffdf008
-// | sign_in_count  : 1                               | 8 bytes
-// +--------------------------------------------------+ 0x7ffdf010
-// | username.ptr   : 0x60001234                      | 8 bytes
-// | username.len   : 17                              | 8 bytes
-// | username.cap   : 17                              | 8 bytes
-// +--------------------------------------------------+ 0x7ffdf028
-// | email.ptr      : 0x60002234                      | 8 bytes
-// | email.len      : 20                              | 8 bytes
-// | email.cap      : 20                              | 8 bytes
-// +--------------------------------------------------+ 0x7ffdf040
-// Heap:
-// +--------------------------------------------------+ 0x60001234
-// | username       : "someusername123"               | 17 bytes + 1 null terminator
-// +--------------------------------------------------+
-// + ...                                              |
-// +--------------------------------------------------+ 0x60002234
-// | email          : "someone@example.com"           | 20 bytes + 1 null terminator
-// +--------------------------------------------------+
+    // Stack:
+    // +--------------------------------------------------+ 0x7ffdf000
+    // | active         : true                            | 1 byte
+    // +--------------------------------------------------+ 0x7ffdf001
+    // | padding        : 0x00 00 00 00 00 00             | 7 bytes (padding for alignment)
+    // +--------------------------------------------------+ 0x7ffdf008
+    // | sign_in_count  : 1                               | 8 bytes
+    // +--------------------------------------------------+ 0x7ffdf010
+    // | username.ptr   : 0x60001234                      | 8 bytes
+    // | username.len   : 17                              | 8 bytes
+    // | username.cap   : 17                              | 8 bytes
+    // +--------------------------------------------------+ 0x7ffdf028
+    // | email.ptr      : 0x60002234                      | 8 bytes
+    // | email.len      : 20                              | 8 bytes
+    // | email.cap      : 20                              | 8 bytes
+    // +--------------------------------------------------+ 0x7ffdf040
+    // Heap:
+    // +--------------------------------------------------+ 0x60001234
+    // | username       : "someusername123"               | 17 bytes + 1 null terminator
+    // +--------------------------------------------------+
+    // + ...                                              |
+    // +--------------------------------------------------+ 0x60002234
+    // | email          : "someone@example.com"           | 20 bytes + 1 null terminator
+    // +--------------------------------------------------+
 
 // ## USING STRUCTS
 fn structs_usage(){

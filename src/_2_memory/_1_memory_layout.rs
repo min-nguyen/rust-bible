@@ -175,8 +175,11 @@ fn _double(n: &i32) -> i32 {
 // Hence, for the question:
 //       "Is a &str a pointer to the stack or the heap"
 // The answer is:
-//       "It is a pointer to wherever it was allocated".
+//       "It is a pointer to wherever it was allocated. A &str is a reference to a string slice,
+//        and it can point to either the stack or the heap, depending on where the string data it refers to is stored."
 //
+//          let s: &str = "hello";  // "hello" is stored in the binary (stack or read-only memory)
+//          let s: &str = &heap_string;  // `s` points to data stored on the heap
 //
 // -------------------------------------------------------------------------------------------------
 // ## Access: Stack vs Heap

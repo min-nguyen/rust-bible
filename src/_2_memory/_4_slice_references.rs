@@ -1,31 +1,42 @@
 // -----------------------------------------------
 // # SLICE REFERENCES
 //
-// A slice [T] is a contiguous sequence of data of type T stored in memory, being a slice of some collection rather than the entire collection itself.
+// A slice [T] is a contiguous sequence of data of type T stored in memory, being a slice of some
+// collection rather than the entire collection itself.
+// It may be part of something stored on either the stack or heap.
 //
-// A slice reference &[T] (or fat pointer) is represented in the stack as two parts:
+// The type [T] is designed to represent sequences of an unknown size at compile-time.
+// However, every variable('s value) in Rust must have a known size n at compile time.
+// Thus, only variables of type [T; n] can be used directly encode a slice in a program.
+//
+// A slice reference (&[T]) provides a way to refer to a slice ([T]) without needing a specific size at compile-time.
+// It is represented in memory as two parts:
 //       { ptr: ..., len: ... }
 //    1. a pointer to the memory holding the contents of the slice
-//    2. a slice length
+//    2. a slice length, computed at run-time
 // By including the slice length in the reference value, this lets us:
-//    * Know the size of the slice at run-time that we can safely refer to.
 //    * Know the size of the slice reference type &[T] at compile-time.
+//    * Know the size of the slice at run-time that we can safely refer to.
 
 fn arrslice_example() {
-  // arr is an array on the stack
+
+  // Not allowed: arr of type [i32] is an arbitrary-sized array slice
+  // let arr: [i32] = [1, 2, 3, 4, 5]; // Error: all local variables must have a known size at compile-time
+
+  // Allowed: arr of type [i32;5] is an array slice of size 5 on the stack
   let arr: [i32; 5] = [1, 2, 3, 4, 5];
 
-  // arr_ref is a normal reference to arr
+  // arr_ref is a normal reference &[i32; 5] to arr
   // its type includes the array's length, determined at compile-time.
   let arr_ref: &[i32; 5] = &arr;       // A normal reference to all of the array.
+
+  // arr_sliceref is a slice reference &[i32]  to all of the array
+  // its value includes the slice's length, determined at run time.
+  let arr_sliceref: &[i32] = &arr[..];
 
   // arr_sliceref is a slice reference from elements 2 to 4.
   // its value includes the slice's length, determined at run time.
   let arr_sliceref: &[i32] = &arr[1..4];
-
-  // arr_wholesliceref is a slice reference to all of the array
-  // its value includes the slice's length, determined at run time.
-  let arr_wholesliceref: &[i32] = &arr[..];
 }
     // Informal Mental Model: what *COULD* happen:
     //  STACK:
@@ -42,11 +53,11 @@ fn arrslice_example() {
     // | arr_ref:  0x7ffeefbff4a0           |  <--- `arr_ref` is a reference to the array.
     // |                                    |  The length of the array is known at compile-time, and need not be stored in memory.
     // +------------------------------------+ 0x7ffeefbff4bc
+    // | arr_sliceref:                      |  <--- `wholeslice` is a slice reference to the entire array portion starting `arr[0]` to `arr[4]`.
+    // |  { ptr: 0x7ffeefbff4a0, len: 5 }   |
+    // +------------------------------------+ 0x7ffeefbff4c4
     // | arr_sliceref:                      |  <--- `slice` is a slice reference to an array portion starting `arr[1]` to `arr[3]`.
     // |  { ptr: 0x7ffeefbff4a4, len: 3 }   |
-    // +------------------------------------+ 0x7ffeefbff4c4
-    // | wholeslice:                        |  <--- `wholeslice` is a slice reference to the entire array portion starting `arr[0]` to `arr[4]`.
-    // |  { ptr: 0x7ffeefbff4a0, len: 5 }   |
     // +------------------------------------+
 
 fn vecslice_example() {
@@ -92,90 +103,26 @@ fn vecslice_example() {
     // +------------------------------------------+ 0x7ffeefbff4d8
     //  HEAP:
     // +------------------------------------------+ 0x60001234
-    // | 1                                        | <--- vec[0]
-    // +------------------------------------------+ 0x60001238
-    // | 2                                        | <--- vec[1]
-    // +------------------------------------------+ 0x6000123C
-    // | 3                                        | <--- vec[2]
-    // +------------------------------------------+ 0x60001240
-    // | 4                                        | <--- vec[3]
+    // | 1, 2, 3, 4, 5                            | 8 bytes x 5 (vec[0] ... vec[4])
     // +------------------------------------------+ 0x60001244
-    // | 5                                        | <--- vec[4]
-    // +------------------------------------------+
 
+// The string slice type (str) is simply [u8]
+fn strslice_example(){
+  // s1('s value) is a reference to a string literal "hello" allocated on the stack
+  // (which is hardcoded in and loaded from the read-only section of the executable binary).
+  let s1: &str = "hello";
 
-// --------------------------------------------------------------------------------
-// ## STRING SLICES (&str)
-//
-// A string slice (str) is essentially the type [u8], a sequence of UTF-8 encoded characters.
-//  1. The type `str` has an unknown size at compile-time because it is designed to represent strings of arbitrary length.
-//  2. Every variable in Rust must have a known size at compile time. This is true even for variables that refer to data
-//     on the heap, because those variables' values are actually represented by pointers which have a known size.
-// Hence it's not possible to generically allocate a value of type `str` because its size is not fixed.
-// A string slice reference (&str) provides a way to refer to the actual slice (string data) without needing a specific size.
-fn string_slices(){
-  // Create an owner of type String pointing to data "hello" allocated on the heap
-  let s = String::from("hello");
+  // s2('s value) owns a string "hello" allocated on the heap
+  let s2: String = String::from("hello");
 
-  let slice = &s[0..2];
-  let slice = &s[..2];
-}
+  // slice_s1('s value) is a reference to a string slice "he"  on the stack
+  let slice_s1 = &s1[0..2];
 
-// --------------------------------------------------------------------------------
-// ### STRING SLICES AS PARAMETERS
-//
-// A parameter of type &str can accept both String references (&String) and string slices (&str).
-// 1. If we choose to provide an argument of type &String, this is the same as a slice &str of the entire string.
-// 2. If we choose to provide an argument of type &str, this could be any slice of the entire string.
-fn get_first_word(s: &mut str) ->  &str {
-  let bytes = s.as_bytes();
+  // slice_s2('s value) is a reference to a string slice "he"  on the heap
+  let slice_s2 = &s2[..2];
 
-  for (i, &item) in bytes.iter().enumerate() {
-      if item == b' ' {
-          return &s[0..i];
-      }
-  }
-
-  &s[..]
-}
-
-// --------------------------------------------------------------------------------
-// ### STRING LITERALS AS SLICES
-//
-//  String literals are interpreted directly as a reference to a string slice.
-//  The data of a string slice is hardcoded in the read-only section of the executable binary.
-fn string_literals(){
-  // Below will:
-  //   1. Create a string slice "hello" that is a sequence of UTF-8 characters, which is then stored in the binary.
-  //   2. Create a string slice reference "hello" that points to that string slice, stored on the stack.
-  let s: &str = "hello";
-  // The reference comprises of:
-  //   1. a pointer to the start of string slice, which is a contiguous sequence 'h', 'e', 'l', 'l', 'o' stored on the binary.
-  //   2, the length of the string slice on the binary
-  let ptr = s.as_ptr();
-  let len = s.len();
-  print!("For string slice {s},  {len}");
-
-  // The String::from method would copy the string literal data from the binary into the heap.
-  let s = String::from(s);
-}
-
-// --------------------------------------------------------------------------------
-// ## OTHER SLICES
-//
-fn i32_slices() {
-  // Creates a fixed-size array stored on stack.
-  let  xs:  [i32; 5] = [1, 2, 3, 4, 5];
-
-  // Creates a reference to a slice that borrows the whole array.
-  analyze_slice(&xs);
-  // Creates a reference to a slice that borrows part of the array.
-  analyze_slice(&xs[1..3]);
-
-  fn analyze_slice(slice: &[i32]) {
-    println!("First element of the slice: {}", slice[0]);
-    println!("The slice has {} elements", slice.len());
-  }
+  // The String::from method would copy the string literal data from the stack into the heap.
+  let s = String::from(s1);
 }
 
 // --------------------------------------------------------------------------------
@@ -201,4 +148,22 @@ fn mutable_slices() {
 
   // Allowed, as this is after r1 and r2's lifetime.
   xs = [1,3,4,4,32];
+}
+
+// --------------------------------------------------------------------------------
+// ### STRING SLICES AS PARAMETERS
+//
+// A parameter of type &str can accept both String references (&String) and string slices (&str).
+// 1. If we choose to provide an argument of type &String, this is the same as a slice &str of the entire string.
+// 2. If we choose to provide an argument of type &str, this could be any slice of the entire string.
+fn get_first_word(s: &mut str) ->  &str {
+  let bytes: &[u8] = s.as_bytes();
+
+  for (i, &item) in bytes.iter().enumerate() {
+      if item == b' ' {
+          return &s[0..i];
+      }
+  }
+
+  &s[..]
 }

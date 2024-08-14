@@ -78,7 +78,7 @@ fn _main() {
 fn _double(n: &i32) -> i32 {
     n * 2
 }
-    // An Informal Mental Model of what *COULD* happen (specific details are imprecise but harmless for understanding.):
+    // Informal Mental Model: what *COULD* happen (specific details are imprecise but harmless for understanding.):
     // 1. The main() function is called.
     //    A stack frame is used for the main() function.
     //    The stack pointer is updated to point to the new stack frame.
@@ -153,10 +153,10 @@ fn _double(n: &i32) -> i32 {
 //
 // Stack vs heap is a tempting but wrong model when thinking about Rust types.
 //
-// Values can be stored anywhere.
+// Values can be stored anywhere:
 //     You cannot tell whether any type will be stored on the stack, heap or binary.
 //
-//     For example, it's possible for local variables to go on the heap
+//     For example, it's possible for local variables to go on the heap.
 //
 // The mental model we should have is:
 //     * All variables as simply storing a value in "memory".
@@ -169,7 +169,8 @@ fn _double(n: &i32) -> i32 {
 // The key takeaway is:
 //    * In general, we shouldn't really worry about where things are stored since it barely makes a difference most of the time.
 //
-//      For example, we almost never care about whether something is on the stack. It can be a fact from which you draw further conclusions about what you can't do with it, but the stack does not have benefits that you can use explicitly in your program. The stack is cheaper than the heap allocator, that's all; it gets you performance, not functionality. Additionally, you can store as much data on the heap as you want, with as much indirection as you want. But if you don't have something on the stack pointing to it, you've lost it (unless its a static variable, but we'll ignore that here.)
+//      For example, we almost never care about whether something is on the stack. It can be a fact from which you draw further conclusions about what you can't do with it, but the stack does not have benefits that you can use explicitly in your program. The stack is cheaper than the heap allocator, that's all; it gets you performance, not functionality.
+//      Additionally, you can store as much data on the heap as you want, with as much indirection as you want. But if you don't have something on the stack pointing to it, you've lost it (unless its a static variable, but we'll ignore that here.)
 //
 // Hence, for the question:
 //       "Is a &str a pointer to the stack or the heap"

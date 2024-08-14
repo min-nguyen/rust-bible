@@ -20,10 +20,10 @@ fn refs_vs_owners() -> String{
     let y = &String::from("gosh");
 
     // Allowed, as x manages a String so returning it will move ownership
-    return x;
+    return x;   // Allowed!
     // Not allowed, as y does not manage a String so cannot transfer ownership.
     // The value y points to (owned by an implicit variable) is dropped when the function exit.
-    return *y;
+    return *y;  // Error: scope of y ends
 }
 
 fn refs_example_1(arg: &i32) -> &i32{
@@ -40,9 +40,9 @@ fn refs_example_1(arg: &i32) -> &i32{
 
     // We can return a reference to a variable owned outside of a function
     // because the borrowed value has a lifetime outside of this scope.
-    return arg // Allowed!
+    return arg; // Allowed!
 }
-    // An Informal Mental Model of what *COULD* happen:
+    // Informal Mental Model: what *COULD* happen:
     // STACK:
     // +-----------------------------------------+
     // | Stack Frame: ref_stack                  |
@@ -71,7 +71,7 @@ fn ref_example_2(arg: &Box<i32>) -> &Box<i32> {
     // because the borrowed value has a lifetime outside of this scope.
     return arg;
 }
-    // An Informal Mental Model of what *COULD* happen:
+    // Informal Mental Model: what *COULD* happen:
     // STACK:
     // +------------------------------------------+
     // | Stack Frame: ref_heap                    |
@@ -89,24 +89,27 @@ fn ref_example_2(arg: &Box<i32>) -> &Box<i32> {
     // +------------------------------------------+
 
 // -------------------------------------------------------------------
-// ## Reference "Scope" and Dereferencing
+// ## Reference Lifetime and Dereferencing
 //
-// Reference "Scope":
-//    A reference's "scope" is from when it is declared to the last time it is used.
-//    This term is conflated with the "scope of a variable".
+// Reference Lifetime (rust-rfc#2094):
+//    The lifetime of a reference is to the span of time in which it is used.
+//    It begins when it is declared, and ends when it is last used.
+//    (Note: The lifetime of a reference can confusingly be called the references's scope)
+//    (Note: The scope of a value can confusingly be called the value's lifetime, and has a different meaning)
 //
-// Dereferencing: to access the underlying value of (x : &T), you can either:
-//    1. Explicitly dereference it, written as *x.
-//    2. Implicitly dereference it, using directly as x, whereby the Rust compiler automatically redeferences it.
+// Dereferencing:
+//    To access the underlying value of (x : &T), you can either:
+//     1. Explicitly dereference it, written as *x.
+//     2. Implicitly dereference it, written directly as x, whereby the Rust compiler automatically redeferences it.
 
-fn reference_scope_and_deferencing_example() {
+fn reference_lifetime_and_deferencing_example() {
     // x refers to a value 10
-    let ref_x: &u32 = &10;     // <<-- beginning of ref_x's scope (as a reference)
+    let ref_x: &u32 = &10;     // <<-- start of ref_x's lifetime (as a reference)
     // Explicitly deference and print out the value
     println!("x = {}", *ref_x);
     // Implicitly deference and print out the value
-    println!("x = {}",  ref_x); // <<-- end of ref_x'scope (as a reference)
-} // end of ref_x's scope (as a normal variable)
+    println!("x = {}",  ref_x); // <<-- end of ref_x's lifetime (as a reference)
+} // <<-- end of ref_x's scope (as a value)
 
 
 // -------------------------------------------------------------------
@@ -115,7 +118,7 @@ fn reference_scope_and_deferencing_example() {
 // There are two types of References:
 //    1. Shared References (&) have read-only access.
 //    2. Mutable References (mut &) have write and read access.
-// At any given time, you can have either one mutable reference in scope or any number of immutable references in scope.
+// At any given time, only one mutable reference can live or any number of immutable references can live.
 //
 
 // -------------------------------------------------------------------
@@ -124,7 +127,7 @@ fn reference_scope_and_deferencing_example() {
 // A shared reference (ref : &T = &x) can only read from the value it borrows.
 //
 // The Rule for Shared References:
-//  * While a shared reference is in scope (being used):
+//  * While a shared reference is alive (being used):
 //    a. a mutable reference cannot be declared
 //    b. the owner cannot change the referenced data
 
@@ -132,29 +135,30 @@ fn shared_reference_example() {
     // s is a mutable variable that manages the string "hello" (on the heap)
     let mut s = String::from("hello");
 
-    // ref_s1 and ref_s2 are immutable references to s
-    let (ref_s1, ref_s2) = (&s, &s); //<<-- Start of ref_s1, ref_s2's scope.
+    // immut_ref_s1 and immut_ref_s2 are immutable references to s
+    let (immut_ref_s1, immut_ref_s2) = (&s, &s); //<<-- start of ref_s1, ref_s2's lifetime (as a reference)
 
-    // A mutable reference cannot be declared while ref_s1/ref_s2 in scope
+    // A mutable reference cannot be declared while ref_s1 or ref_s2 lives
     // let mut_ref_s : &mut String = &mut s;
 
-    // The owner cannot change the referenced data while ref_s1/ref_s2 in scope
+    // The owner cannot change the referenced data while ref_s1 or ref_s2 lives
     // s.push('h');
 
-    // Below is the last use of ref_s1 and ref_s2.
+    // Below is the last use of immut_ref_s1 and immut_ref_s2.
     println!("The length of '{}' is {}."
-            , ref_s1, (*ref_s2).len()); // <<-- End of ref_s1/ref_s2's scope (as a reference)
+            , immut_ref_s1, (*immut_ref_s2).len()); // <<-- end of immut_ref_s1, immut_ref_s2's lifetime (as a reference)
 }
 
 // -------------------------------------------------------------------
 // ### MUTABLE REFERENCES (mutable borrowing)
 //
-// A mutable reference (ref : &mut T = &mut x) can mutate the value that it borrows. indirectly points to (not the address of the OWNER it points to).
+// A mutable reference (ref : &mut T = &mut x) can mutate the value that it borrows.
+// (Note: It cannot mutate the address of what it points to).
 //
 // The Rules for Mutable References:
 //  1. Only mutable variables can have mutable references.
 //     I.e. if the owner cannot modify its data, then neither can any references.
-//  2. While a mutable reference is in scope (being used):
+//  2. While a mutable reference is alive (being used):
 //     a. No new references can be declared.
 //     b. No existing references can be used.
 //     c. The owner cannot be used.
@@ -167,19 +171,19 @@ fn mut_reference_example() {
     let immut_ref_s: &String = &s;
 
     // mut_ref_s is a mutable reference to s
-    let mut_ref_s: &mut String  = &mut s; // <<-- mut_ref_s begins scope
+    let mut_ref_s: &mut String  = &mut s;   // <<-- start of mut_ref_s's lifetime
 
-    // No new references can be declared while mut_ref_s is in scope
+    // No new references can be declared while mut_ref_s is alive
     // let new_immut_ref_s: &String = &s; // ERROR: mut_ref_s is used later
 
-    // No existing references can be used while mut_ref_s is no scope
+    // No existing references can be used while mut_ref_s is alive
     // print!("{immut_ref_s}"); // ERROR: mut_ref_s is still being used
 
-    // The owner cannot be used while mut_ref_s is in scope
+    // The owner cannot be used while mut_ref_s is alive
     // s.push_str("s"); // ERROR: mut_ref_s is still being used
 
     // This marks the last usage of mut_ref_s
-    // mut_ref_s.push_str("s");// <<-- mut_ref_s ends scope
+    mut_ref_s.push_str("s");         // <<-- end of mut_ref_s's lifetime
 
     // The owner s can be used again, as mut_ref_s is not used afterwards
     s.push_str("s");

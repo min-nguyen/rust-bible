@@ -48,7 +48,7 @@ fn structs_usage(){
   // [Mutability]
   //    Mutability is always inherited in Rust. There is no intrinsic notion of mutability in the definitions of datatypes.
   //    Hence, there is no intrinsic notion of mutability in struct definitions so their fields cannot be marked `mut`.
-  //    Instead, fields always inherit the mutability of the containing structs which is decided by the owner that creates that the data.
+  //    Instead, fields always inherit the mutability of the containing structs which is decided by the owner of that data.
 
   // Creating a mutable struct instance
   let mut user1 = User {

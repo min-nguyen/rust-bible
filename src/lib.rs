@@ -13,10 +13,10 @@ mod _2_memory {
     mod _3_references;
     mod _4_slice_references;
 }
-// mod _3_structured_data {
-//     mod _1_struct_memory_layout;
-//     mod _2_struct_ownership;
-// }
+mod _3_structured_data {
+    mod _1_struct_memory_layout;
+    // mod _2_struct_ownership;
+}
 
 // mod submodule2;
 fn main() {

@@ -13,9 +13,10 @@ mod _2_memory {
     mod _3_references;
     mod _4_slices;
 }
-mod _3_structs {
+mod _3_structs_and_enums {
     mod _1_structs;
-    mod _2_methods;
+    mod _2_enums;
+    mod _3_methods;
 }
 
 // mod submodule2;

@@ -1,7 +1,15 @@
 // -----------------------------------------------
 // # STRUCTS
 //
-// A struct is represented in memory as a contiguous sequence of its field values.
+// A struct represents a product of values, all contained inside a single constructor.
+// It is represented in memory as a contiguous sequence of its field values.
+//
+//    struct StructName { field_name: field_type
+//                      , ...}
+//
+//    let x = StructName { field_name: field_value
+  //                     , ...}
+//
 // The type of each field determines its own memory representation.
 //
 //    As noted before [_1_memory_layout.rs], stack vs heap is a tempting but wrong model when thinking about Rust types.

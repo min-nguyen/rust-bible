@@ -9,13 +9,13 @@ mod _1_basics {
 }
 mod _2_memory {
     mod _1_memory_layout;
-    mod _2_owners;
+    mod _2_ownership;
     mod _3_references;
     mod _4_slices;
 }
-mod _3_structured_data {
-    mod _1_struct_memory_layout;
-    // mod _2_struct_ownership;
+mod _3_structs {
+    mod _1_structs;
+    mod _2_methods;
 }
 
 // mod submodule2;

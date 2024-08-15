@@ -59,7 +59,7 @@ fn owner_example() {
 //
 fn ownership_scope_example(){
     {
-      // s (i.e. its value) owns a String allocated on the heap
+      // s (i.e. its value) is a String object that owns a string allocated on the heap
       let s: String = String::from("hello"); // <<-- s is valid from this point forward
     } // <<-- s (i.e. its value) goes out of scope so is no longer valid.
       //      hence the data it manages is dropped.
@@ -137,9 +137,9 @@ fn ownership_scope_example(){
 // [MOVE]
 fn move_data(){
     {
-        // s1('s value) manages a String on the heap
+        // s1('s value), a String object, manages a string on the heap
         let s1: String = String::from("hello"); // <<-- s1 is valid hereon.
-        // s2('s value) manages a String whose ownership was moved from s1.
+        // s2('s value) manages a string on the heap whose ownership was moved from s1.
         let s2: String = s1; // <<-- s1 is no longer valid, and s2 is valid hereon
     } // <<-- Both s1 and s2 are out of scope (with s2 no longer valid).
       //      Only s2's String is dropped, as s1 does not manage any data.
@@ -158,9 +158,9 @@ fn copy_data(){
 // [CLONE]
 fn clone_data(){
     {
-        // s1('s value) manages a String on the heap
+        // s1('s value) manages a string on the heap
         let s1: String = String::from("hello");   // <<-- s1 is valid hereon
-        // s2('s value) manages a different String cloned from s1
+        // s2('s value) manages a different string on the heap cloned from s1
         let s2: String = s1.clone();              // <<-- s2 is valid hereon
     } // <<-- Both s1 and s2 are out of scope (and no longer valid).
       //      Both of their managed data is dropped.
@@ -172,9 +172,9 @@ fn clone_data(){
 // Passing a value as a function argument will transfer ownership exactly like when a value is assigned to a variable.
 //
 fn ownership_in_function_calls() {
-    // s1 manages a String on the heap
+    // s1 manages a string on the heap
     let s: String = String::from("hello"); // <<-- s is valid hereon
-    // some_string manages the String whose ownership was moved from s.
+    // some_string manages the string whose ownership was moved from s.
     takes_ownership(s);       // <<-- some_string is valid and s is invalid hereon
     // <<-- some_string is out of scope and no longer valid; it's data is dropped,
     // The following line causes a compile-time error because s is no longer valid.
@@ -206,11 +206,11 @@ fn makes_copy(some_integer: i32) {          // <<-- some_integer is valid hereon
 // Returning a value from a function can also transfer ownership.
 //
 fn ownership_in_function_returns() {
-    // s1 manages a String on the heap
+    // s1 manages a string on the heap
     let s1 = gives_ownership();         // <<-- s1 is valid hereon
-    // s2 manages a String on the heap
+    // s2 manages a string on the heap
     let s2 = String::from("hello");     // <<-- s2 is valid hereon
-    // s3 manages a String whose ownership was moved from s2.
+    // s3 manages a string on the heap whose ownership was moved from s2.
     let s3 = takes_and_gives_back(s2); // <<-- s3 is valid and s2 is invalid hereon.
 } // <<-- s3, s2, s1 go out of scope (and become invalid), and only s3's and s1's data are dropped.
   //      Because s2's ownership was moved, there is nothing to drop.

@@ -18,6 +18,7 @@
 //    * Know the size of the slice reference type &[T] at compile-time.
 //    * Know the size of the slice at run-time that we can safely refer to.
 
+// An array [T; n] is a static sequence of elements of a known-size.
 fn arrslice_example() {
 
   // Not allowed: arr of type [i32] is an arbitrary-sized array slice
@@ -60,6 +61,7 @@ fn arrslice_example() {
     // |  { ptr: 0x7ffeefbff4a4, len: 3 }   |
     // +------------------------------------+
 
+// A Vec<T> is a dynamic representation of an array [T].
 fn vecslice_example() {
   // vec manages a vector on the heap
   let vec: Vec<i32> = vec![1, 2, 3, 4, 5];
@@ -106,11 +108,12 @@ fn vecslice_example() {
     // | 1, 2, 3, 4, 5                            | 8 bytes x 5 (vec[0] ... vec[4])
     // +------------------------------------------+ 0x60001244
 
-// The string slice type (str) is simply [u8]
+// A string slice `str` is shorthand an array type [u8] **without** a known size.
+// The `String` type is to [u8] what a Vec<T> is to [T].
 fn strslice_example(){
   // s1('s value) is a reference to a string literal "hello" allocated on the stack
   // (which is hardcoded in and loaded from the read-only section of the executable binary).
-  let s1: &str = "hello";
+  let s1: &str = "hello"; // i.e. let s1: &[u8; 5] = "hello";
 
   // s2('s value) owns a string "hello" allocated on the heap
   let s2: String = String::from("hello");

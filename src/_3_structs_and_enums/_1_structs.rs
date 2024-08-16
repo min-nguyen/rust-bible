@@ -3,14 +3,13 @@
 //
 // A struct represents a product of values, all contained inside a single constructor.
 // It is represented in memory as a contiguous sequence of its field values.
+// The type of each field determines its own memory representation.
 //
 //    struct StructName { field_name: field_type
 //                      , ...}
 //
 //    let x = StructName { field_name: field_value
-  //                     , ...}
-//
-// The type of each field determines its own memory representation.
+//                      , ...}
 //
 //    As noted before [_1_memory_layout.rs], stack vs heap is a tempting but wrong model when thinking about Rust types.
 //    That is, values can be stored anywhere and it is not easy to tell whether a type will be stored on the stack, heap or binary.
@@ -74,18 +73,19 @@ fn structs_usage(){
 }
 
 // -----------------------------------------------
-// ## (Full and Partial) Ownership Transfer for Structs
+// ## Ownership Transfer for Structs: Full and Partial Moves
 //
 // The rules of ownership transfer are the same for structs as for any value or datatype containing values.
 //
-// When assigning a struct from one variable to another, a full Move, Copy, or Clone applies for the struct type.
+// When assigning a **struct** from one variable to another, a full Move, Copy, or Clone applies for the struct type.
 //    let struct2 = struct1;
 // A Move, Copy, or Clone happens for all its fields, and determines whether or not struct1 is still valid.
 //
-// When assigning a struct field of a variable to another, a partial Move, Copy, or Clone applies  for the struct field type,
+// When assigning a **struct field** of a variable to another, a partial Move, Copy, or Clone applies for the struct according
+// to the specific field type.
 //    let x = struct1.field;
 // A Move, Copy, or Clone applies to just that field, and determines whether or not struct1.field is still
-// valid, which then determines if struct1 is fully valid or only partially valid.
+// valid, which then determines if struct1 is **fully valid** or only **partially valid**.
 
 // -------------------------------------------------------------------------------------------------
 // [MOVE]

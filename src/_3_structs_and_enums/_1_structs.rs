@@ -38,39 +38,60 @@ struct User {
 
 // -----------------------------------------------
 // ## Using Structs
-fn structs_usage(){
-  // [Mutability]
-  //    Mutability is always inherited in Rust. There is no intrinsic notion of mutability in the definitions of datatypes.
-  //    Hence, there is no intrinsic notion of mutability in struct definitions so their fields cannot be marked `mut`.
-  //    Instead, fields always inherit the mutability of the containing structs which is decided by the owner of that data.
-
-  // Mutable structs
+fn using_structs(){
+  // [Specify struct values]
   let mut user1 = User {
     active: true,
     sign_in_count: 1,
     username: String::from("someusername123"),
   };
-  // Accessing a field
+  // [Accessing a field]
   let b = user1.active;
-  // Mutating a field
+  // [Mutating a field]
   user1.active = false;
 
-  // Syntax sugar: assigning fields with function arguments:
+  // [Syntax sugar: assigning fields with function arguments.]
+  // We can implicitly assign a function argument to a field if it matches the field name
   fn build_user(username: String) -> User {
       User {
           active: true,
           sign_in_count: 1,
-          username, // we can implicitly assign a function argument to a field if it matches the field name
+          username,
       }
   }
 
-  // Syntax sugar: reusing only parts of structs.
+  // [Syntax sugar: reusing only parts of structs.]
+  // We can specify new field values where desired, and then use `..` followed by an existing struct to reuse its field values
   let user2: User = User {
       username: String::from("anotherexample"),
       ..
       user1
   };
 }
+
+// -----------------------------------------------
+// ## Mutability in Datatypes: Structs
+//
+//    Mutability is always inherited in Rust, and there is no intrinsic notion of mutability in the definitions of datatypes.
+//    Hence structs fields always inherit the mutability of the struct value, which is decided by the owner of that data, and
+//    cannot be defined as inherently mutable.
+
+fn mutability_in_structs(){
+  // immut_user is an immutable struct, and so all its fields are immutable
+  let immut_user: User = User {
+    active: true,
+    sign_in_count: 1,
+    username: String::from("someusername123"),
+  };
+  // hence its fields can only be read
+  let b = immut_user.active;
+
+  // mut_user now *mutably* owns the struct data moved from immut_user, and so all its fields are mutable
+  let mut mut_user: User = immut_user;
+  // hence its fields can now be mutated
+  mut_user.active = false;
+}
+
 
 // -----------------------------------------------
 // ## Ownership Transfer for Structs: Full and Partial Moves

@@ -2,7 +2,7 @@
 // -----------------------------------------------
 // # REFERENCES AND BORROWING
 //
-// A variable is a REFERENCE to some value if it points to the owner of that value.
+// A variable (x : &T = &v) is a REFERENCE to the value v of type T, and points to the owner of v.
 //
 // Creating a reference is called BORROWING, letting you borrow the value while:
 //    - 1) not taking ownership of it
@@ -15,9 +15,9 @@
 
 fn refs_vs_owners() -> String{
     // x manages a string "golly" in memory (allocated on the heap)
-    let x = String::from("golly");
+    let x: String = String::from("golly");
     // y refers to, and borrows the value of, a string "gosh" in memory (allocated on the heap)
-    let y = &String::from("gosh");
+    let y: &String = &String::from("gosh");
 
     // Allowed, as x manages a String so returning it will move ownership
     return x;   // Allowed!

@@ -16,6 +16,7 @@
 //   - The keywords `Self`` and `self`` in an impl block are used to refer to the type and a specific instance.
 //   - A type can have multiple `impl` blocks.
 
+// -----------------------------------------------
 // ## Defining Methods and Associated Functions
 //
 // Methods are a specific kind of associated function whose first parameter is always:
@@ -80,6 +81,7 @@ impl Message {
 }
 
 
+// -----------------------------------------------
 // ## Using Methods and Associated Functions
 //
 // Using the method of a value (x : T) is written as `x.method()` without providing the self argument.

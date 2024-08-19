@@ -17,6 +17,7 @@ mod _3_structs_and_enums {
     mod _1_structs;
     mod _2_enums;
     mod _3_associated_functions;
+    mod _4_generics;
 }
 
 // mod submodule2;

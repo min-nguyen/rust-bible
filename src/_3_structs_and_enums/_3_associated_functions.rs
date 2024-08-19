@@ -1,5 +1,5 @@
 // -----------------------------------------------
-// # Associated Functions
+// # ASSOCIATED FUNCTIONS
 //
 // An implementation block `impl` specifies a set of functions associated with a struct or enum type (or trait not covered yet).
 //
@@ -13,8 +13,8 @@
 //    }
 //
 // The Rules of Impl Blocks:
-//   - The keywords Self and self in an impl block are used to refer to the type and a specific instance.
-//   - A type can have multiple impl blocks.
+//   - The keywords `Self`` and `self`` in an impl block are used to refer to the type and a specific instance.
+//   - A type can have multiple `impl` blocks.
 
 // ## Defining Methods and Associated Functions
 //

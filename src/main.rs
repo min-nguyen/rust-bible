@@ -13,7 +13,7 @@ mod _2_memory {
     mod _3_references;
     mod _4_slices;
 }
-mod _3_structs_and_enums {
+mod _3_structs_enums_traits {
     mod _1_structs;
     mod _2_enums;
     mod _3_methods;

@@ -1,7 +1,7 @@
 // -----------------------------------------------
 // # METHODS (AND ASSOCIATED FUNCTIONS)
 //
-// An implementation block `impl` specifies a set of methods and functions associated with a struct or enum type (or trait not covered yet).
+// An implementation block `impl` specifies a set of methods and functions associated with a Struct or Enum type (or Trait not covered yet).
 //
 //    impl StructName/EnumName {
 //      fn method_name(&self, ...) -> ... {

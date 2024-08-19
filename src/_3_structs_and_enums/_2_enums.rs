@@ -16,8 +16,8 @@
 
 enum Message {
   Quit,                         //  Quit has no associated data
-  Move { x: i32, y: i32 },      //  Move has named fields
-  Write(String),                //  Write contains a single String
+  Move { x: i32, y: i32 },      //  Move has named fields for two  i32 values
+  Write(String),                //  Write contains a single { ptr, len, cap } value that manages a string on the heap
   ChangeColor(i32, i32, i32),   //  ChangeColor includes three i32 values
 }
 
@@ -97,14 +97,24 @@ fn matching(n : i32) {
 //
 // The `ref x` syntax lets us declare a variable x as a reference instead.
 //    The following 2 lines are equivalent:
-//      let x = &y;
-//      let ref x = y;
-// Its intended purpose is to be used *within* patterns so that when assigning variable names to matched values,
-// we can borrow the value instead of copying or moving its ownership.
+//      let x = &v;
+//      let ref x = v;
+// We need `ref x` (instead of x :&T = &v) if we are directly matching on a value v, and
+// we want to borrow the value instead of copying or moving its ownership.
+//      let m : Maybe<u8> = ...;
+//      match m as {
+//        case Just(ref x) => ... // x is a reference to a u8 value
+//      };
+//
+// Alternatively, we could create a reference for the value beforehand, whereby matching on that reference will
+// *automatically* create references for (and borrow) any of its contained values.
+//      let m : Maybe<u8> = ...;
+//      match &m as {
+//        case Just(x) =>     ... // x is a reference to a u8 value
+//      };
 
 fn matching_with_refs(msg : Message){
-
-  // Matching without refs
+  // Matching a value without `ref`
   let msg1: Message = match msg {
     // x_val and y_val own the i32 values x and y copied from msg
     Message::Move{x : x_val, y: y_val}
@@ -112,29 +122,77 @@ fn matching_with_refs(msg : Message){
       => Message::Move{x : x_val, y: y_val},
     // s owns the String value (partially) moved from msg
     Message::Write(s)
-      // below moves s's ownership of the String value to msg1
+      // below *moves* s's ownership of the String value to msg1
       => Message::Write(s),
     _
       => Message::Quit
   };
 
-  // We cannot match on `s` in msg, because its ownership was moved to msg1
+  // We cannot match on `s` in the partially moved msg, because s's ownership was moved to msg1
   // let x = match msg {
   //   Message::Write(s) => (), // Error: use of moved value in msg
   //   _ => ()
   // };
 
-  // Matching with refs
+  // Matching a value with `ref`
   let msg2: Message = match msg1 {
-    // x_val and y_val are references that borrow the i32 values x and y from msg
-    Message::Move{x : ref x_val, y: ref y_val}
-      // below returns x_val and y_val as values in msg1
-      => Message::Move{x : *x_val, y: *y_val},
+    // x_ref and y_ref are references that borrow the i32 values x and y from msg1
+    Message::Move{x : ref x_ref, y: ref y_ref}
+      // below dereferences and returns their underlying values in msg2
+      => Message::Move{x : *x_ref, y: *y_ref},
     // s is a reference that borrows the String value from msg
     Message::Write(ref s)
-      // below moves s's ownership of the String value to msg1
-      => Message::Write(&s),
-    _
+      // below has to read the value of s and create a new String, as it does not own an underlying string
+      => Message::Write(s.to_string()),
+    // msg is a reference that borrows the entire msg1 value
+    ref msg
       => Message::Quit
   };
+
+  // Matching a reference (without `ref`)
+  let msg3: Message = match &msg2 {
+    // x_ref and y_ref are references that borrow the i32 values x and y from msg2
+    Message::Move{x : x_ref, y: y_ref}
+      // below dereferences and returns their underlying values in msg3
+      => Message::Move{x : *x_ref, y: *y_ref},
+    // s is a reference that borrows the String value from msg2
+    Message::Write( s)
+      // below has to read the value of s and create a new String, as it does not own an underlying string
+      => Message::Write(s.to_string()),
+    // msg is a reference that borrows the entire msg2 value
+    msg
+      => Message::Quit
+  };
+}
+
+// -----------------------------------------------
+// ## Pattern matching: If-Let
+//
+// The `if let pattern = variable { code  }` lets us match a variable as a single pattern while ignoring the rest, and
+// only execute a block of code if that match was successful.
+
+fn matching_with_if_let(msg : Message){
+  // Matching a value using if-let (without `ref`)
+  let msg1 : Message = if let Message::Write( s) = msg {
+      print!("{s}");
+      // below *moves* s's ownership of the String value to msg1
+      Message::Write(s)
+  } else { Message::Quit };
+
+  // We cannot assign msg to msg2, because it was partially moved when moving s's ownership to msg1
+  // let msg2 = msg; // Error: msg was partially moved
+
+  // Matching a value using if-let (with `ref`)
+  let msg2 : Message = if let Message::Write(ref s) = msg1 {
+      print!("{s}");
+      // below has to read the value of s and create a new String, as it does not own an underlying string
+      Message::Write(s.to_string())
+  } else { Message::Quit };
+
+  // Matching a reference using if-let  (without `ref`)
+  let msg3 : Message = if let Message::Write( s) = &msg2 {
+    print!("{s}");
+    // below has to read the value of s and create a new String, as it does not own an underlying string
+    Message::Write(s.to_string())
+  } else { Message::Quit };
 }

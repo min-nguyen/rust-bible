@@ -16,7 +16,7 @@ mod _2_memory {
 mod _3_structs_and_enums {
     mod _1_structs;
     mod _2_enums;
-    mod _3_associated_functions;
+    mod _3_methods;
     mod _4_traits;
     mod _5_generics;
 }

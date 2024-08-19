@@ -1,7 +1,7 @@
 // -----------------------------------------------
-// # ASSOCIATED FUNCTIONS
+// # METHODS (AND ASSOCIATED FUNCTIONS)
 //
-// An implementation block `impl` specifies a set of functions associated with a struct or enum type (or trait not covered yet).
+// An implementation block `impl` specifies a set of methods and functions associated with a struct or enum type (or trait not covered yet).
 //
 //    impl StructName/EnumName {
 //      fn method_name(&self, ...) -> ... {
@@ -19,7 +19,7 @@
 //   - A type can have multiple `impl` blocks.
 
 // -----------------------------------------------
-// ## Defining Methods and Associated Functions
+// ## Defining Methods (and Associated Functions)
 //
 // Syntax:
 //
@@ -96,7 +96,7 @@ impl Message {
 
 
 // -----------------------------------------------
-// ## Using Methods and Associated Functions
+// ## Using Methods (and Associated Functions)
 //
 // Syntax:
 //

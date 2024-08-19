@@ -11,11 +11,19 @@
 //                    Variant2Name{ field_name: field_type, ... }
 //                  , ... }
 //
-//    let x = EnumName::Variant1Name(arg_value, ...);
-//    let y = EnumName::Variant2Name{field_name: field_value, ...};
+//    let e1 = EnumName::Variant1Name(arg_value, ...);
+//    let e2 = EnumName::Variant2Name{field_name: field_value, ...};
 
 // -----------------------------------------------
 // ## Defining Enums
+//
+// Syntax:
+//
+//    enum EnumName { Variant1Name( arg_type, ...),
+//                    Variant2Name{ field_name: field_type, ... }
+//                  , ... }
+//
+
 enum Message {
   Quit,                         //  Quit has no associated data
   Move { x: i32, y: i32 },      //  Move has named fields for two  i32 values
@@ -25,8 +33,15 @@ enum Message {
 
 // -----------------------------------------------
 // ## Using Enums
+//
+// Syntax:
+//
+//    let x = EnumName::Variant1Name(arg_value, ...);
+//    let y = EnumName::Variant2Name{field_name: field_value, ...};
+//
+
 fn enums_usage(){
-  // [Specifying enum values]
+  // Specifying enum values
   let quit_message: Message = Message::Quit;
   let move_message: Message = Message::Move { x: 0, y: 0 };
   let write_message: Message = Message::Write(String::from("hello"));
@@ -39,17 +54,24 @@ fn enums_usage(){
 // The `match variable { pattern => code, ... }` syntax lets us pattern match on a types as being a particular values,
 // and also give variable names to those values and any of their contained data.
 //
+// Syntax:
+//
+//     match variable {  pattern1 => code,
+//                       pattern2 => code,
+//                     , ...
+//    }
+//
 // The Rules of Matching:
 //    * Matching must be exhaustive over all values of the type.
 //    * Matching must be consistent in the return type for each pattern.
 //    * Matching a pattern as a variable sets that variable as an owner
 //      (in the same way as that a function's parameter names are used to "match" against the provided arguments).
 //
-// Syntax:
-//    * The `x@pattern => ...` syntax lets us set a variable name x that owns the value pattern matched on.
-//    * The `_` syntax lets us match any pattern/value and not assign a variable to it.
-fn matching(n : i32) {
+// Additional Syntax:
+//    * The `x@pattern => ...` syntax lets us set a variable name x that owns the value/pattern matched on.
+//    * The `_` syntax lets us match any value/pattern and not assign a variable to it.
 
+fn matching(n : i32) {
   // Matching on basic values.
   let msg: Message = match n {
     // Matches on the i32 value 0

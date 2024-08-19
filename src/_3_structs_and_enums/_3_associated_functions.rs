@@ -3,7 +3,7 @@
 //
 // An implementation block `impl` specifies a set of functions associated with a struct or enum type (or trait not covered yet).
 //
-//    impl StructName/EnumName/TraitName {
+//    impl StructName/EnumName {
 //      fn method_name(&self, ...) -> ... {
 //
 //      }
@@ -12,12 +12,26 @@
 //      }
 //    }
 //
+//
+//
 // The Rules of Impl Blocks:
-//   - The keywords `Self`` and `self`` in an impl block are used to refer to the type and a specific instance.
+//   - The keywords `Self`` and `self` in an impl block are used to refer to the type and a specific instance.
 //   - A type can have multiple `impl` blocks.
 
 // -----------------------------------------------
 // ## Defining Methods and Associated Functions
+//
+// Syntax:
+//
+//    impl StructName/EnumName {
+//      fn method_name(&self, ...) -> ... {
+//
+//      }
+//      fn fun_name(...) -> ... {
+//
+//      }
+//    }
+//
 //
 // Methods are a specific kind of associated function whose first parameter is always:
 //   1. `&self`  which is shorthand for (self : &Self),
@@ -83,6 +97,13 @@ impl Message {
 
 // -----------------------------------------------
 // ## Using Methods and Associated Functions
+//
+// Syntax:
+//
+//     let s : StructOrEnumType = ...;
+//     s.method_name(...);
+///
+//     StructOrEnumType::fn_name(...);
 //
 // Using the method of a value (x : T) is written as `x.method()` without providing the self argument.
 // Using the underlying method of a reference (x : &T) is written by either:

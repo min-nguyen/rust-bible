@@ -4,6 +4,9 @@
 //
 // A variable (x : &T = &v) is a REFERENCE to the value v of type T, and points to the owner of v.
 //
+//         let v : T  = ...;
+//         let x : &T = &v;
+//
 // Creating a reference is called BORROWING, letting you borrow the value while:
 //    - 1) not taking ownership of it
 //    - 2) not making a copy,

@@ -8,14 +8,22 @@
 //    struct StructName { field_name: field_type
 //                      , ...}
 //
-//    let x = StructName { field_name: field_value
+//    let s = StructName { field_name: field_value
 //                      , ...}
+//    let y = s.field_name;
 //
 //    As noted before [_1_memory_layout.rs], stack vs heap is a tempting but wrong model when thinking about Rust types.
 //    That is, values can be stored anywhere and it is not easy to tell whether a type will be stored on the stack, heap or binary.
 
 // -----------------------------------------------
 // ## Defining Structs
+//
+// Syntax:
+//
+//    struct StructName { field_name: field_type
+//                      , ...}
+//
+
 struct User {
   active: bool,              // active is a bool value
   sign_in_count: u64,        // sign_in_count is an int value
@@ -40,20 +48,35 @@ struct User {
 
 // -----------------------------------------------
 // ## Using Structs
+//
+// Syntax:
+//
+//    let x = StructName { field_name: field_value
+//                      , ...}
+//
+//    let y = x.field_name;
+//
+// Syntax sugar:
+//
+//  - Assigning fields with function arguments.
+//    We can implicitly assign a function argument to a field if it matches the field name.
+//  - Reusing parts of structs.
+//    We can specify new field values where desired, and then use `..` followed by an existing struct to reuse its field values
+
 fn using_structs(){
-  // [Specify struct values]
+  // Specifying struct values
   let mut user1 = User {
     active: true,
     sign_in_count: 1,
     username: String::from("someusername123"),
   };
-  // [Accessing a field]
+  // Accessing a field
   let b = user1.active;
-  // [Mutating a field]
+  // Mutating a field
   user1.active = false;
 
-  // [Syntax sugar: assigning fields with function arguments.]
-  // We can implicitly assign a function argument to a field if it matches the field name
+  // Syntax sugar: Assigning fields with function arguments.
+  // - We can implicitly assign a function argument to a field if it matches the field name
   fn build_user(username: String) -> User {
       User {
           active: true,
@@ -62,8 +85,8 @@ fn using_structs(){
       }
   }
 
-  // [Syntax sugar: reusing only parts of structs.]
-  // We can specify new field values where desired, and then use `..` followed by an existing struct to reuse its field values
+  // Syntax sugar: Reusing parts of structs.
+  // - We can specify new field values where desired, and then use `..` followed by an existing struct to reuse its field values
   let user2: User = User {
       username: String::from("anotherexample"),
       ..

@@ -97,10 +97,12 @@ fn ref_example_2(arg: &Box<i32>) -> &Box<i32> {
 //    (Note: The lifetime of a reference can confusingly be called the references's scope)
 //    (Note: The scope of a value can confusingly be called the value's lifetime, and has a different meaning)
 //
-// Dereferencing:
+// Explicit and Implicit Dereferencing:
 //    To access the underlying value of (x : &T), you can either:
 //     1. Explicitly dereference it, written as *x.
 //     2. Implicitly dereference it, written directly as x, whereby the Rust compiler automatically redeferences it.
+//    Note that it is not always unambigious to the Rust compiler whether it should automatically deference a variable,
+//    and so sometimes, we need to explicitly dereference it ourself
 
 fn reference_lifetime_and_deferencing_example() {
     // x refers to a value 10

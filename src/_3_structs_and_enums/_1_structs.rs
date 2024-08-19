@@ -13,7 +13,9 @@
 //
 //    As noted before [_1_memory_layout.rs], stack vs heap is a tempting but wrong model when thinking about Rust types.
 //    That is, values can be stored anywhere and it is not easy to tell whether a type will be stored on the stack, heap or binary.
-//
+
+// -----------------------------------------------
+// ## Defining Structs
 struct User {
   active: bool,              // active is a bool value
   sign_in_count: u64,        // sign_in_count is an int value

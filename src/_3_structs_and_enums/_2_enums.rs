@@ -14,6 +14,8 @@
 //    let x = EnumName::Variant1Name(arg_value, ...);
 //    let y = EnumName::Variant2Name{field_name: field_value, ...};
 
+// -----------------------------------------------
+// ## Defining Enums
 enum Message {
   Quit,                         //  Quit has no associated data
   Move { x: i32, y: i32 },      //  Move has named fields for two  i32 values

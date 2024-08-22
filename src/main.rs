@@ -17,9 +17,10 @@ mod _3_structs_enums_traits {
     mod _1_structs;
     mod _2_enums;
     mod _3_methods;
+    pub mod _4_traits;
 }
 
 // mod submodule2;
 fn main() {
-    // reference_example_2()
+    _3_structs_enums_traits::_4_traits::using_traits_example();
 }

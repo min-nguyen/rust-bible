@@ -30,6 +30,7 @@ fn refs_vs_owners() -> String{
 }
 
 fn refs_example_1(arg: &i32) -> &i32{
+
     // x manages 42
     let x = 42;
     // y is a reference to x

@@ -1,15 +1,6 @@
 // -----------------------------------------------
 // # OWNERS
 //
-// The Three Rules of Ownership:
-//  1. Each Value Has a Single Owner.
-//     That is, each value is owned by a single variable.
-//  2. When the Owner Goes Out of Scope, the Value Is Freed.
-//       For values on the stack, this is managed trivially by the stack pointer.
-//       For values on the heap, Rust automatically *drop*s the memory associated with the value.
-//  3. Ownership Can Be Transferred (Moved).
-//     The original variable becomes invalid, and the new variable becomes the owner of the data.
-//
 // A variable (i.e. its value) that is an owner of some data means it manages the data.
 // This either means:
 //   1) It is that data on the stack, and hence trivially manages itself.
@@ -19,12 +10,41 @@
         //  b.  A length
         //  c.  A capacity
 //
+// Three Rules of Ownership:
+//  1. Each Value Has a Single Owner.
+//       That is, each value is owned by a single variable.
+//  2. When the Owner Goes Out of Scope, the Value Is Freed.
+//       For values on the stack, this is managed trivially by the stack pointer.
+//       For values on the heap, Rust automatically *drop*s the memory associated with the value.
+//  3. Ownership Can Be Transferred (Moved).
+//       The original variable becomes invalid, and the new variable becomes the owner of the data.
+// Fourth Rule for Mutability:
+//  4. The Owner is the Sole Decider of The Mutability of its Value.
+//       This refers back Rust's rule of mutability i.e. that mutability is inherited in Rust.
+
 
 fn owner_example() {
-  // x('s value) trivially owns 42 on the stack
-  let x = 42;
-  // y('s value) owns a Vec allocated on the heap
-  let y: Vec<i32> = Vec::from([1,2,3]);
+  // x1('s value) trivially owns 42 on the stack
+  let x1 = 42;
+  // xmut('s value) mutably owns an i32 on the stack, which is *copied* from another i32 (as i32 implements copy)
+  fn add_one(mut xmut :   i32) -> i32{
+    xmut += 1;
+    return xmut;
+  }
+  // x2('s value) now owns 43 on the stack that was originally copied from x1 to xmut and modified.
+  let x2: i32 = add_one(x1);
+  print!("{0}", x2);
+
+  // vec1('s value) is a Vec that owns a vector allocated on the heap
+  let vec1: Vec<i32> = Vec::from([1,2,3]);
+  // vecmut('s value) mutably owns an vector on the heap, which is *moved* from another vec (as vec does not implement copy)
+  fn add_ones(mut vecmut : Vec<i32> ) -> Vec<i32>{
+    vecmut.push(4);
+    return vecmut;
+  }
+  // vec2('s value) is a Vec owns a vector on the heap that was moved from vec1 to vecmut and modified
+  let vec2: Vec<i32> = add_ones(vec1);
+  print!("{0}", vec2[4]);
 }
   // Informal Mental Model: what *COULD* happen:
   // STACK:

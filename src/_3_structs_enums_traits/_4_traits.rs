@@ -33,11 +33,18 @@
 //    }
 //
 trait Show {
+  // Method
   fn show(&self) -> String;
-  fn show_twice(&mut self) ->  String{
-    let mut owned_string: String = self.show().to_owned();
+  // Default method
+  fn show_twice(&self) -> String{
+    // Create a mutable owner for a string on the heap
+    let mut owned_string: String = self.show();
+    // Create a slice reference to a string literal (on the stack)
     let borrowed_string: &str = "world";
-    owned_string.push_str(borrowed_string)
+    // Mutate the string on the heap.
+    owned_string.push_str(borrowed_string);
+    // Return ownership of string on the heap.
+    return owned_string;
   }
 }
 
@@ -52,14 +59,24 @@ trait Show {
 //      }
 //    }
 //
-
 struct User {
   active: bool,
   sign_in_count: u64,
   username: String,
 }
+
 impl Show for User {
   fn show(&self) -> String {
     self.username.to_string()
   }
+}
+
+pub fn using_traits_example(){
+  let user1: User = User {
+    active:true,
+    sign_in_count:0,
+    username:String::from("hello")
+  };
+  let s: String = user1.show_twice();
+  print!("{s}");
 }

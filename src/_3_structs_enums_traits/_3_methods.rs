@@ -4,7 +4,7 @@
 // An  `impl` block implements a set of methods and functions associated with a Struct or Enum type (or Trait not covered yet).
 //
 //    impl StructName/EnumName {
-//      fn method_name(&self, ...) -> ... {
+//      fn method_name(&self : Self, ...) -> ... {
 //
 //      }
 //      fn fun_name(...) -> ... {

@@ -194,7 +194,7 @@ fn using_generic_enums2<T : std::ops::Add
 // ## Generics in Traits
 //
 // We can use generics to define abstract (bounded) traits.
-// Whereas regular traits let us declare trait methods for an abstract type `Self`,
+// Whereas regular traits let us declare trait methods for a single abstract type `Self`,
 //         generic traits let us declare trait methods for further abstract types, <T, ...>, which
 //          can be related or unrelated to the type `Self.`
 //

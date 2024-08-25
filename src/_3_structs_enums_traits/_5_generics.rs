@@ -194,25 +194,38 @@ fn using_generic_enums2<T : std::ops::Add
 // ## Generics in Traits
 //
 // We can use generics to define abstract (bounded) traits.
-// Whereas regular traits let us declare trait methods for a single abstract type `Self`,
-//         generic traits let us declare trait methods for further abstract types, <T, ...>, which
-//          can be related or unrelated to the type `Self.`
+// Whereas regular traits let us declare trait methods for a single type parameter `Self`,
+// ... generic traits let us declare trait methods for multiple further type parameters, <T, ...>, which can be related or unrelated to `Self.`
 //
 // Syntax:
 //
 //    trait TraitName<T : Traits, ...> {
-//      ...
+//        fn method(self: Self) -> T;
 //    }
 //
 //    impl<T : Traits, ...> TraitName<T, ...> for StructOrEnum {
-//      ...
+//        fn method(self: Self) -> T {
+//
+//        }
 //    }
-
+//
+// That is, we can think of this in Rust:
+//    trait TraitName<T> {
+//      fn method(self: Self) -> T;
+//    }
+// as this in Haskell:
+//    type class TraitName self t where
+//       method :: self -> t
+//
+//
+//
 trait Decrement<T> {
-  fn decrement(&self) -> T;
+  fn decrement(self: &Self) -> T;
 }
 
-// the use of abstract traits doesn't really come in handy here:
+// this says that `decrement` can return i32 for a i32.
+// Note: defining Decrement as generic trait isn't super interesting here, as both the
+// generic type parameter <T> and the implicit type parameter Self are exactly the same.
 impl Decrement<i32> for i32 {
   fn decrement(&self) -> i32 {
       self - 1

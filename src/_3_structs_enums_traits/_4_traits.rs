@@ -1,24 +1,31 @@
 // -----------------------------------------------
 // # TRAITS
 //
-// Traits are a collection of methods that any type can provide an implementation of.
+// Traits are a collection of methods and associated functions that any type can provide an implementation of.
 // Combined with generics (later), trait bounds then let us specify abstract types as implementing these traits.
 //
 //    trait TraitName {
-//      fn method_name(&self, ...);
-//      fn default_method_name(&self, ...) {
+//      fn method_name(self : Self, ...);
+//      fn default_method_name(self : Self, ...) {
 //
 //      }
+//      fn fun_name(...) -> ...;
 //    }
 //
 //    impl TraitName for Type {
-//      fn method_name(&self, ...) {
+//      fn method_name(self : Self, ...) {
+//        ...
+//      }
+//      fn fun_name(...) -> ... {
 //        ...
 //      }
 //    }
 //
 //
-
+// Traits in Rust can be thought of as type classes in Haskell with an abstract type parameter `selftype` representing `Self``:
+//    type class ClassName selftype where
+//        method_name :: selftype -> ...
+//
 
 // -----------------------------------------------
 // ## Defining Traits
@@ -30,6 +37,7 @@
 //      fn default_method_name(&self, ...) {
 //
 //      }
+//      fn fun_name(...) -> ...;
 //    }
 //
 trait Show {
@@ -54,8 +62,11 @@ trait Show {
 // Syntax:
 //
 //    impl TraitName for Type {
-//      fn method_name(&self, ...) -> ... {
-//
+//      fn method_name(self : Self, ...) {
+//        ...
+//      }
+//      fn fun_name(...) -> ... {
+//        ...
 //      }
 //    }
 //

@@ -1,10 +1,10 @@
 // -----------------------------------------------
 // # METHODS (AND ASSOCIATED FUNCTIONS)
 //
-// An  `impl` block implements a set of methods and functions associated with a Struct or Enum type (or Trait not covered yet).
+// An  `impl` block implements a set of methods and associated functions for a Struct or Enum type (or Trait not covered yet).
 //
 //    impl StructName/EnumName {
-//      fn method_name(&self : Self, ...) -> ... {
+//      fn method_name(self : &Self, ...) -> ... {
 //
 //      }
 //      fn fun_name(...) -> ... {
@@ -12,11 +12,12 @@
 //      }
 //    }
 //
-//
-//
 // The Rules of Impl Blocks:
-//   - The keywords `Self`` and `self` in an impl block are used to refer to the type and a specific instance.
-//   - A type can have multiple `impl` blocks.
+//   - A struct or enum can have multiple `impl` blocks.
+//   - The keyword `Self` is reserved to refer to the specific instance type.
+//   - The keyword `self` is reserved for the first argument of each method, and refers to the specific instance.
+//   - The method argument `self` without a type annotation is shorthand for `self : Self`.
+//   - The method argument `&self` without a type annotation is shorthand for `self : &Self`.
 
 // -----------------------------------------------
 // ## Defining Methods (and Associated Functions)
@@ -32,15 +33,23 @@
 //      }
 //    }
 //
+// *Methods* are a specific kind of associated function whose first parameter is always named `self`.
+// - The type of the `self` variable can either be:
+//   1. `Self`, and so `self` is a value that owns the struct instance moved or copied from the one the method is called on.
+//            fn method_name(self, ....)  ... shorthand for ...  fn method_name(self: Self, ...)
+//   2. `&Self`, and so `self`` is a immutable reference that borrows the struct instance the method is called on.
+//            fn method_name(&self, ....) ... shorthand for ...  fn method_name(self: &Self, ...)
+//   3. `&mut Self`, and so `self` is a mutable reference that borrows the struct instance the method is called on.
+//            fn method_name(&mut self, ....) ... shorthand for ... fn method_name(self: &mut Self, ...)
+// - The mutability of the `self` variable **itself** is determined when declaring it (here as a method argument) to own
+//   a value, just like any other variable. These is no shorthand for expressing that `self` is a mutable variable.
+//   We must explicitly write one of the following:
+//            1.  fn method_name(mut self: Self, ...)
+//            2.  fn method_name(mut self: &Self, ...)
+//            3.  fn method_name(mut self: &mut Self, ...)
 //
-// Methods are a specific kind of associated function whose first parameter is always:
-//   1. `&self`  which is shorthand for (self : &Self),
-//      This  creates a reference that borrows the struct instance the method is called on.
-//   2. `self`,  which is shorthand for (self : Self)
-//      This creates a value that owns a struct instance moved or copied from the one the method is called on.
-//
-// Other associated functions which are not methods are often used as constructors that return a new instance of the type.
-//
+// *Associated functions* that are not methods have no `self`` parameter.
+// - These are often used as constructors that return a new instance of the type.
 
 #[derive(Clone, Copy)]
 struct Rectangle {        // Rectangle is copyable

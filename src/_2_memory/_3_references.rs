@@ -95,7 +95,8 @@ fn ref_example_2(arg: &Box<i32>) -> &Box<i32> {
 // ## Reference Lifetime and Dereferencing
 //
 // Reference Lifetime (rust-rfc#2094):
-//    The lifetime of a reference is to the span of time in which it is used.
+//    The lifetime of a reference is to the span of time in which it is used, and ensure that they are valid as long as we need them to be.
+//
 //    It begins when it is declared, and ends when it is last used.
 //    (Note: The lifetime of a reference can confusingly be called the references's scope)
 //    (Note: The scope of a value can confusingly be called the value's lifetime, and has a different meaning)

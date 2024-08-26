@@ -42,8 +42,9 @@
 //   3. `&mut Self`, and so `self` is a mutable reference that borrows the struct instance the method is called on.
 //            fn method_name(&mut self, ....) ... shorthand for ... fn method_name(self: &mut Self, ...)
 // - The mutability of the `self` variable **itself** is determined when declaring it (here as a method argument) to own
-//   a value, just like any other variable. These is no shorthand for expressing that `self` is a mutable variable.
-//   We must explicitly write one of the following:
+//   a value, just like any other variable.
+//   Although there is shorthand for expressing the types Self, &Self, and &mut Self, these is no shorthand for
+//   expressing mutability of the variable `self`. Instead, we must explicitly write one of the following:
 //            1.  fn method_name(mut self: Self, ...)
 //            2.  fn method_name(mut self: &Self, ...)
 //            3.  fn method_name(mut self: &mut Self, ...)

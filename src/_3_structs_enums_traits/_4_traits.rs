@@ -22,7 +22,7 @@
 //    }
 //
 //
-// Traits in Rust can be thought of as type classes in Haskell with an abstract type parameter `selftype` representing `Self``:
+// Traits in Rust can be thought of as type classes in Haskell with a type parameter `Self`:
 //    type class ClassName selftype where
 //        method_name :: selftype -> ...
 //

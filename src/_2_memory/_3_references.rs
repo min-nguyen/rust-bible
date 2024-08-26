@@ -2,7 +2,7 @@
 // -----------------------------------------------
 // # REFERENCES AND BORROWING
 //
-// A variable (x : &T = &v) is a REFERENCE to the value v of type T, and points to the owner of v.
+// A variable (x : &T = &v) that is a REFERENCE to the value v of type T means it points to the owner of v.
 //
 //         let v : T  = ...;
 //         let x : &T = &v;
@@ -11,8 +11,7 @@
 //    - 1) not taking ownership of it
 //    - 2) not making a copy,
 //    - 3) not preventing the original owner from accessing it when done.
-// Unlike a pointer, a reference is guaranteed to point to a valid value of a particular type for the lifetime of that reference.
-//
+// A reference in Rust is guaranteed to point to a valid value for the lifetime of that reference.
 // A reference is represented in memory as just one part:
 //   - { ptr : 0x... } A pointer to another variable or value.
 

@@ -19,6 +19,7 @@ mod _3_structs_enums_traits {
     mod _3_methods;
     mod _4_traits;
     mod _5_generics;
+    mod _6_lifetimes;
 }
 
 // mod submodule2;

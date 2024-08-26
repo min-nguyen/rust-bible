@@ -26,7 +26,7 @@
 // -----------------------------------------------
 // ## Generics in Functions
 //
-// We can use generics to define abstract (bounded) function types i.e. their argument and return types
+// We can use generics to define parameterised (bounded) function types i.e. their argument and return types
 //
 // Syntax:
 //
@@ -58,7 +58,7 @@ where
 // -----------------------------------------------
 // ## Generics in Structs
 //
-// We can use generics to define abstract (trait-bounded) struct types.
+// We can use generics to define parameterised (trait-bounded) struct types.
 // These can be used (and perhaps specialised) to define struct methods and regular functions.
 //
 // Syntax:
@@ -84,7 +84,7 @@ impl Point<f32, f32> {
   }
 }
 
-// Generic methods for abstract structs
+// Generic methods for abstract parameterised structs
 impl<T : PartialOrd> Point<T, T> {
   // warning: will cause move of ownership unless T and Point<T, T> implement copy
   fn largest_coord(self) -> T {
@@ -106,7 +106,7 @@ fn using_generic_structs1(p1 : Point<i32, i32>, p2 : Point<i32, i32>) -> Point<i
   }
 }
 
-// Generic functions for abstract structs
+// Generic functions for abstract parameterised structs
 fn using_generic_structs2<T : PartialOrd
                    + std::ops::Add<Output = T>  // Output is an associated type of the Add trait
                    + Copy>
@@ -125,7 +125,7 @@ fn using_generic_structs2<T : PartialOrd
 // -----------------------------------------------
 // ## Generics in Enums
 //
-// We can use generics to define abstract (trait-bounded) enum types.
+// We can use generics to define parameterised (trait-bounded) enum types.
 // These can be used (and perhaps specialised) to define enum methods and regular functions.
 //
 // Syntax:
@@ -149,7 +149,7 @@ impl<E> Result<u32, E> {
   }
 }
 
-// Generic methods for abstract enums
+// Generic methods for abstract parameterised enums
 impl<T, E> Result<T, E> {
   fn from_ok(self, default : T) -> T {
     match self {
@@ -169,7 +169,7 @@ fn using_generic_enums1() -> Result<i32, std::num::ParseIntError>{
   Result::Ok(number)
 }
 
-// Generic functions for abstract enums
+// Generic functions for abstract parameterised enums
 fn using_generic_enums2<T : std::ops::Add
                           + std::ops::Add<Output = T>
                           + Clone
@@ -193,7 +193,7 @@ fn using_generic_enums2<T : std::ops::Add
 // -----------------------------------------------
 // ## Generics in Traits
 //
-// We can use generics to define abstract (bounded) traits.
+// We can use generics to define parameterised (bounded) traits.
 // Whereas regular traits let us declare trait methods for a single type parameter `Self`,
 // ... generic traits let us declare trait methods for multiple further type parameters, <T, ...>, which can be related or unrelated to `Self.`
 //
@@ -209,11 +209,11 @@ fn using_generic_enums2<T : std::ops::Add
 //        }
 //    }
 //
-// That is, we can think of this in Rust:
+// Generic (parameterised) traits in Rust:
 //    trait TraitName<T> {
 //      fn method(self: Self) -> T;
 //    }
-// as this in Haskell:
+// can be thought of as multiparameterised type classes in Haskell:
 //    type class TraitName self t where
 //       method :: self -> t
 //
@@ -223,9 +223,9 @@ trait Decrement<T> {
   fn decrement(self: &Self) -> T;
 }
 
-// this says that `decrement` can return i32 for a i32.
-// Note: defining Decrement as generic trait isn't super interesting here, as both the
-// generic type parameter <T> and the implicit type parameter Self are exactly the same.
+// This says that `decrement` can return i32 for a i32.
+// (Note: defining Decrement as generic trait isn't super interesting here, as both the
+//  generic type parameter <T> and the implicit type parameter Self are exactly the same.)
 impl Decrement<i32> for i32 {
   fn decrement(&self) -> i32 {
       self - 1

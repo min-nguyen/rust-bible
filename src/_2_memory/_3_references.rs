@@ -25,11 +25,10 @@ fn refs_vs_owners() -> String{
     return x;   // Allowed!
     // Not allowed, as y does not manage a String so cannot transfer ownership.
     // The value y points to (owned by an implicit variable) is dropped when the function exit.
-    return *y;  // Error: scope of y ends
+    return *y;  // Error: scope of y's borrowed value ends
 }
 
 fn refs_example_1(arg: &i32) -> &i32{
-
     // x manages 42
     let x = 42;
     // y is a reference to x
@@ -38,11 +37,12 @@ fn refs_example_1(arg: &i32) -> &i32{
     let z = &7;
 
     // We cannot return a reference to a local variable owned by the current function.
-    // because the borrowed value does not live long enough.
+    // because the scope of the borrowed value stops before the function.
     // return y; // ERROR: the value that y points to is dropped when the function exits.
 
     // We can return a reference to a variable owned outside of a function
-    // because the borrowed value has a lifetime outside of this scope.
+    // because the borrowed value has a scope outside of this function,
+    // and so the lifetime of the reference outlives the function.
     return arg; // Allowed!
 }
     // Informal Mental Model: what *COULD* happen:
@@ -71,7 +71,8 @@ fn ref_example_2(arg: &Box<i32>) -> &Box<i32> {
     // return y;  // Same error
 
     // We can return a reference to variable owned outside of a function
-    // because the borrowed value has a lifetime outside of this scope.
+    // because the borrowed value has a scope outside of this function,
+    // and so the lifetime of the reference outlives the function.
     return arg;
 }
     // Informal Mental Model: what *COULD* happen:

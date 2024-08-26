@@ -1,7 +1,7 @@
 // -----------------------------------------------
 // # TRAITS
 //
-// Traits are a collection of methods and associated functions that any type can provide an implementation of.
+// Traits are a collection of methods and associated functions for an unknown type `Self` that any type can provide an implementation of.
 // Combined with generics (later), trait bounds then let us specify abstract types as implementing these traits.
 //
 //    trait TraitName {

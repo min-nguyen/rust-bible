@@ -8,10 +8,10 @@
 // Using explicit lifetimes requires generics.
 //
 // Syntax for lifetimes in types:
-//   &'a T           //  the reference to a value of type T has the lifetime 'a
+//   &'a T            //  the reference to a value of type T has the lifetime 'a
 //
 // Syntax for lifetimes as parameters:
-//   foo<'a, 'b, ... //  the lifetime parameter 'a must live at least as long as `foo`
+//   foo<'a, 'b, ...> //  the lifetime parameter 'a must live at least as long as `foo`
 //
 
 
@@ -55,7 +55,7 @@ fn main1() {
 //    struct StructName<'a, ...> { xref : &'a T, ... }
 //
 //    impl<'a, ...> StructName<'a, ...> {
-//      fn method_name(&self, ...) -> {
+//      fn method_name(&self, ...) -> T {
 //      }
 //    }
 
@@ -100,26 +100,26 @@ fn main2() {
 //        }
 //    }
 
-// Trait Definition with a Lifetime Parameter:
-trait Summary<'a> {
-  fn summarize(&self) -> &'a str;
-}
+// // Trait Definition with a Lifetime Parameter:
+// trait Summary<'a> {
+//   fn summarize(&self) -> &'a str;
+// }
 
-// A struct with annotation of lifetimes.
-struct Article<'a> {
-  title: &'a str,
-  content: &'a str,
-}
+// // A struct with annotation of lifetimes.
+// struct Article<'a> {
+//   title: &'a str,
+//   content: &'a str,
+// }
 
-// Trait Implementation for the Struct:
-impl<'a> Summary<'a> for Article<'a> {
-  fn summarize(&self) -> &'a str {
-      self.title
-  }
-}
+// // Trait Implementation for the Struct:
+// impl<'a> Summary<'a> for Article<'a> {
+//   fn summarize(&self) -> &'a str {
+//       self.title
+//   }
+// }
 
-fn main3() {
-    let article: Article = Article {title: "hello", content: "world"};
-    let title: &str = article.summarize();
-    println!("Article article is {:?}", title);
-}
+// fn main3() {
+//     let article: Article = Article {title: "hello", content: "world"};
+//     let title: &str = article.summarize();
+//     println!("Article article is {:?}", title);
+// }

@@ -18,9 +18,12 @@ mod _3_structs_enums_traits {
     mod _2_enums;
     mod _3_methods;
     mod _4_traits;
-    mod _5_generics;
-    mod _6_lifetimes;
 }
+mod _4_generics{
+    mod _1_generics;
+    mod _2_lifetimes;
+}
+
 
 // mod submodule2;
 fn main() {

@@ -23,7 +23,6 @@ mod _4_generics{
     mod _2_lifetimes;
 }
 
-
 // mod submodule2;
 fn main() {
     // reference_example_2()

@@ -32,21 +32,17 @@ fn refs_vs_owners() -> String{
 // -------------------------------------------------------------------
 // ## Reference Lifetime
 //
-//    A reference's lifetime is a named region of code that it is guaranteed to point to a valid value.
+//    A reference's lifetime is a (named) region of code that it is guaranteed to point to a valid value.
 //    It begins when it is declared and ends when it is no longer used, which must be before its pointed value goes out of scope.
 //    A reference's lifetime hence must not outlive the scope of its value.
 
-fn refs_lifetime_desugar(){
-
-}
-
 fn refs_lifetime_example(arg: &i32) -> &i32{
     // x manages 42
-    let x = 42;
+    let x: i32 = 42;
     // y is a reference to x
-    let y = &x;
+    let y: &i32 = &x;
     // z is a reference to 7, not owned by an explicit variable.
-    let z = &7;
+    let z: &i32 = &7;
 
     // We cannot return a reference to a local variable owned by the current function.
     // because the scope of the borrowed value stops before the function.
@@ -57,6 +53,67 @@ fn refs_lifetime_example(arg: &i32) -> &i32{
     // and so the lifetime of the reference outlives the function.
     return arg; // Allowed!
 }
+
+fn refs_lifetime_desugar(){
+    // Example 1:  Each let statement implicitly introduces a scope.
+    let x: i32 = 0;
+    let y: &i32 = &x;
+    let z: &&i32 = &y;
+    // desugars to:
+    'a: {
+        let x: i32 = 0;
+        'b: {
+            // lifetime used for y is 'b because that's good enough to reference 'a.
+            let y: &i32 = & x;
+            'c: {
+                //  lifetime used for z is 'c because that's good enough to reference y with lifetime 'b.
+                let z: &&i32 = &y; // "a reference to a reference to an i32"
+            }
+        }
+    }
+
+    // Example 2: Passing references to outer scopes will cause Rust to infer a larger lifetime:
+    let a: i32 = 0;
+    let b: &&i32;
+    let c: &i32 = &x;
+    b = &c;
+    // desugars to:
+    'a: {
+        let a: i32 = 0;
+        'b: {
+            // lifetime used for b is 'b
+            let b: &&i32;
+            'c: {
+                // lifetime used for c is 'b because it must live long enough for to be used by reference b with lifetime 'b.
+                let c: &i32 = &a;
+                b = &c;
+            }
+        }
+    }
+}
+
+fn refs_lifetimes_subtleties(){
+
+    // Below is fine:
+    let mut x: i32 = 10;
+    let xref: &i32 = &x;
+    // last usage of reference x:
+    println!("{}", xref);
+    // this is OK, as xref is no longer used
+    x = 5;
+
+    // Below is not fine:
+    #[derive(Debug)]
+    struct X<'a>(&'a i32);
+    impl Drop for X<'_> { fn drop(&mut self) {}  }
+    let mut x: i32 = 5;
+    // x is a value that contains an immutable reference to data
+    let xrefcontainer: X<'_> = X(&x);
+    println!("{:?}", xrefcontainer);
+    // this is not okay as `xrefcontainer` is a value that implements drop (only called when it goes out of scope):
+    //   x = 6; // ERROR: we haven't finished using the immutable reference to `data` that `x` contains.
+
+}   // drop(x) is called here
 
 // -------------------------------------------------------------------
 // ## Dereferencing

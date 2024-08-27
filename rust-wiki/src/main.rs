@@ -13,7 +13,6 @@ mod _2_memory {
 mod _2_ownership {
     mod _2_owners;
     mod _3_references;
-    mod _4_lifetimes;
     mod _4_slices;
 }
 mod _3_structs_enums_traits {

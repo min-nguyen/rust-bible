@@ -1,19 +1,20 @@
 
 // -----------------------------------------------
-// # REFERENCES AND BORROWING
+// # REFERENCES
 //
-// A variable (x : &T = &v) that is a REFERENCE to the value v of type T means it points to the owner of v.
+// A variable (x : &T = &v) that is a reference to the value v of type T means it points to the owner of v.
 //
 //         let v : T  = ...;
 //         let x : &T = &v;
 //
-// Creating a reference is called BORROWING, letting you borrow the value while:
-//    - 1) not taking ownership of it
-//    - 2) not making a copy,
-//    - 3) not preventing the original owner from accessing it when done.
-// A reference in Rust is guaranteed to point to a valid value for the lifetime of that reference.
+// Creating a reference is called borrowing, letting you borrow the value while:
+//    1) Not taking ownership of it
+//    2) not making a copy,
+//    3) not preventing the original owner from accessing it when done.
+//
 // A reference is represented in memory as just one part:
 //   - { ptr : 0x... } A pointer to another variable or value.
+//
 
 fn refs_vs_owners() -> String{
     // x manages a string "golly" in memory (allocated on the heap)
@@ -28,7 +29,18 @@ fn refs_vs_owners() -> String{
     return *y;  // Error: scope of y's borrowed value ends
 }
 
-fn refs_example_1(arg: &i32) -> &i32{
+// -------------------------------------------------------------------
+// ## Reference Lifetime
+//
+//    A reference's lifetime is a named region of code that it is guaranteed to point to a valid value.
+//    It begins when it is declared and ends when it is no longer used, which must be before its pointed value goes out of scope.
+//    A reference's lifetime hence must not outlive the scope of its value.
+
+fn refs_lifetime_desugar(){
+
+}
+
+fn refs_lifetime_example(arg: &i32) -> &i32{
     // x manages 42
     let x = 42;
     // y is a reference to x
@@ -45,62 +57,9 @@ fn refs_example_1(arg: &i32) -> &i32{
     // and so the lifetime of the reference outlives the function.
     return arg; // Allowed!
 }
-    // Informal Mental Model: what *COULD* happen:
-    // STACK:
-    // +-----------------------------------------+
-    // | Stack Frame: ref_stack                  |
-    // +-----------------------------------------+ 0x7ffeefbff4a0
-    // | x:  42                                  | 4 bytes (stack-allocated integer)
-    // +-----------------------------------------+ 0x7ffeefbff4a4
-    // | y: 0x7ffeefbff4a0                       | 8 bytes (pointer to x on stack)
-    // +-----------------------------------------+ 0x7ffeefbff4ac
-    // | z: 0x7ffeefbff4b4                       | 8 bytes (pointer to temporary integer on stack)
-    // +-----------------------------------------+ 0x7ffeefbff4b4
-    // | Temporary Value: 7                      | 4 bytes (stack-allocated integer, not owned by any variable)
-    // +-----------------------------------------+
-
-fn ref_example_2(arg: &Box<i32>) -> &Box<i32> {
-    // x manages 42 (allocated on the heap)
-    let x = Box::new(42);
-    // y is a reference to x
-    let y = &x;
-
-    // We cannot return a reference to a local variable owned by the current function.
-    // because the borrowed value does not live long enough.
-    // return &x; // Error
-    // return y;  // Same error
-
-    // We can return a reference to variable owned outside of a function
-    // because the borrowed value has a scope outside of this function,
-    // and so the lifetime of the reference outlives the function.
-    return arg;
-}
-    // Informal Mental Model: what *COULD* happen:
-    // STACK:
-    // +------------------------------------------+
-    // | Stack Frame: ref_heap                    |
-    // +------------------------------------------+ 0x7ffeefbff4a0 <--- x owns the heap-allocated data
-    // | x: Box { ptr: 0x60001234,                | 8 bytes (pointer to 42 on heap)
-    // |          len: ..,                        | 8 bytes
-    // |          capacity: ..,                   | 8 bytes
-    // | }                                        |
-    // +------------------------------------------+ 0x7ffeefbff4a8 <--- y is a reference to x
-    // | y: &Box { ptr: 0x7ffeefbff4a0 }          | 8 bytes (pointer to x on stack)
-    // +------------------------------------------+
-    //  HEAP:
-    // +------------------------------------------+ 0x60001234
-    // | 42                                       | 8 bytes
-    // +------------------------------------------+
 
 // -------------------------------------------------------------------
-// ## Reference Lifetime and Dereferencing
-//
-// Reference Lifetime (rust-rfc#2094):
-//    The lifetime of a reference is to the span of time in which it is used, and ensure that they are valid as long as we need them to be.
-//
-//    It begins when it is declared, and ends when it is last used.
-//    (Note: The lifetime of a reference can confusingly be called the references's scope)
-//    (Note: The scope of a value can confusingly be called the value's lifetime, and has a different meaning)
+// ## Dereferencing
 //
 // Explicit and Implicit Dereferencing:
 //    To access the underlying value of (x : &T), you can either:
@@ -109,15 +68,14 @@ fn ref_example_2(arg: &Box<i32>) -> &Box<i32> {
 //    Note that it is not always unambigious to the Rust compiler whether it should automatically deference a variable,
 //    and so sometimes, we need to explicitly dereference it ourself
 
-fn reference_lifetime_and_deferencing_example() {
+fn reference_deferencing_example() {
     // x refers to a value 10
-    let ref_x: &u32 = &10;     // <<-- start of ref_x's lifetime (as a reference)
+    let ref_x: &u32 = &10;
     // Explicitly deference and print out the value
     println!("x = {}", *ref_x);
     // Implicitly deference and print out the value
-    println!("x = {}",  ref_x); // <<-- end of ref_x's lifetime (as a reference)
-} // <<-- end of ref_x's scope (as a value)
-
+    println!("x = {}",  ref_x);
+}
 
 // -------------------------------------------------------------------
 // ## Shared VS Mutable References
@@ -127,9 +85,7 @@ fn reference_lifetime_and_deferencing_example() {
 //    2. Mutable References (mut &) have write and read access.
 // At any given time, only one mutable reference can live or any number of immutable references can live.
 //
-
-// -------------------------------------------------------------------
-// ### SHARED REFERENCES (borrowing)
+// ### Shared References
 //
 // A shared reference (ref : &T = &x) can only read from the value it borrows.
 //
@@ -137,7 +93,7 @@ fn reference_lifetime_and_deferencing_example() {
 //  * While a shared reference is alive (being used):
 //    a. a mutable reference cannot be declared
 //    b. the owner cannot change the referenced data
-
+//
 fn shared_reference_example() {
     // s is a mutable variable that manages the string "hello" (on the heap)
     let mut s = String::from("hello");
@@ -155,9 +111,8 @@ fn shared_reference_example() {
     println!("The length of '{}' is {}."
             , immut_ref_s1, (*immut_ref_s2).len()); // <<-- end of immut_ref_s1, immut_ref_s2's lifetime (as a reference)
 }
-
-// -------------------------------------------------------------------
-// ### MUTABLE REFERENCES (mutable borrowing)
+//
+// ### Mutable References
 //
 // A mutable reference (ref : &mut T = &mut x) can mutate the value that it borrows.
 // (Note: It cannot mutate the address of what it points to).
@@ -170,6 +125,7 @@ fn shared_reference_example() {
 //     b. No existing references can be used.
 //     c. The owner cannot be used.
 //  In other words, only one variable may actively refer to a value while it is being mutated.
+//
 fn mut_reference_example() {
     // s is a mutable owner of "hello" in memory
     let mut s = String::from("hello");
@@ -197,10 +153,10 @@ fn mut_reference_example() {
 }
 
 // -------------------------------------------------------------------
-// ## COMBINATIONS OF (IM)MUTABLE VARIABLES THAT ARE (IM)MUTABLE REFERENCES
+// ## (Im)mutable Variables that are (Im)mutable References
 //
-// As variables themselves can be mutable, we can also have combinations of (im)mutable variables that are (im)mutable references.
-// In other words, as well as modifying the referenced value, it is possible to modify what a reference points to.
+// As variables can be mutable, we can also have combinations of (im)mutable variables that are (im)mutable references.
+// In other words, we can both modify what a reference points to as well as modify what the referenced data.
 fn mutable_variables_and_references(){
     let mut x : i32 = 2;
 

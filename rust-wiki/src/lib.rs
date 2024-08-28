@@ -22,6 +22,10 @@ mod _4_generics{
     mod _1_generics;
     mod _2_lifetimes;
 }
+mod _5_functional_features{
+    mod _1_closures;
+}
+
 
 // mod submodule2;
 fn main() {

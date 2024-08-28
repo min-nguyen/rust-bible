@@ -26,8 +26,6 @@ mod _5_functional_features{
     mod _1_closures;
 }
 
-
-// mod submodule2;
 fn main() {
     // reference_example_2()
 }

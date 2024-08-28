@@ -12,7 +12,7 @@ mod _2_ownership {
     mod _3_references;
     mod _4_slices;
 }
-mod _3_structs_enums_traits {
+mod _3_datatypes_and_traits {
     mod _1_structs;
     mod _2_enums;
     mod _3_methods;
@@ -21,5 +21,5 @@ mod _3_structs_enums_traits {
 
 // mod submodule2;
 fn main() {
-    _3_structs_enums_traits::_4_traits::using_traits_example();
+    _3_datatypes_and_traits::_4_traits::using_traits_example();
 }

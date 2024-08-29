@@ -42,14 +42,14 @@ fn closures_vs_fns(){
 //
 // As closures are variables that own things, they can capture values from their environment in
 // three ways, which are the same as how a function can take a parameter:
-//  1. Performing a Move (or Copy where possible) of all the captured values it uses.
-//     Syntax (`move`)
+//  1. Capturing Ownership: Performing a Move (or Copy where possible) of all the captured values it uses.
+//       Syntax (using `move`)
 //          let clsre = move |...| { body }
-//  2. Borrowing immutably all the captured values it uses, which is the **default**.
-//     Syntax (as normal):
+//  2. Capturing a Reference: Borrowing immutably all the captured values it uses, which is the **default**.
+//       Syntax (as normal):
 //          let clsre = | ...| { body }
-//  3. Borrowing mutably of  all the captured values it uses.
-//     Syntax (`mut`)
+//  3. Capturing a Mutable Reference: Borrowing mutably of all the captured mutable values it uses.
+//       Syntax (using `mut`):
 //          let mut clsre = | ...| { body }
 //
 // The closure decides which of these to use based on what its body does with the captured values.
@@ -92,6 +92,6 @@ fn closure_borrow_mut() {
   let mut fn_borrow_mut = || { print!("{:?}", xs.push(x)) };
 
   fn_borrow_mut();
-  // Can reuse the borrowed value after clsre_borrow has finished (possibly mutably) using it
+  // Can reuse the borrowed mutable value after clsre_borrow has finished using (and possibly mutating) it
   println!("After calling closure: {xs:?}");
 }

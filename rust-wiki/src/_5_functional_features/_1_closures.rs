@@ -42,18 +42,18 @@ fn closures_vs_fns(){
 //
 // As closures are variables that own things, they can capture values from their environment in
 // three ways, which are the same as how a function can take a parameter:
-//  1. Capturing Ownership: Performing a Move (or Copy where possible) of all the captured values it uses.
+//  1. Capturing Ownership: Performing a Move (or Copy where possible) of *all* the captured values it uses.
 //       Syntax (using `move`)
 //          let clsre = move |...| { body }
-//  2. Capturing a Reference: Borrowing immutably all the captured values it uses, which is the **default**.
+//  2. Capturing a Reference: Borrowing immutably *all* the captured values it uses, which is the **default**.
 //       Syntax (as normal):
 //          let clsre = | ...| { body }
-//  3. Capturing a Mutable Reference: Borrowing mutably of all the captured mutable values it uses.
+//  3. Capturing a Mutable Reference: Borrowing mutably *all* the captured mutable values it uses.
 //       Syntax (using `mut`):
 //          let mut clsre = | ...| { body }
 //
 // The closure decides which of these to use based on what its body does with the captured values.
-//
+// (It is also possible to *selectively* move, copy, or borrow the captured values, by using some extra code.)
 
 fn closure_move_and_copy() {
   // x owns an i32 which implements Copy, and xs owns a Vec which does not.

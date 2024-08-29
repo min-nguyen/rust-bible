@@ -38,7 +38,7 @@ fn closures_vs_fns(){
 }
 
 // -----------------------------------------------
-// ## Closures: Moving, Copying, or Borrowing the Captured Values
+// ## Closures: Moving, Copying, or Borrowing the Captured Values of the Closure Body
 //
 // As closures are variables that own things, they can capture values from their environment in
 // three ways, which are the same as how a function can take a parameter:
@@ -98,5 +98,5 @@ fn closure_borrow_mut() {
 
 
 // -----------------------------------------------
-// ## Closures: Moving, Copying, or Borrowing the Captured Values
+// ## Closures: Moving Captured Values out of the Closure Body
 //

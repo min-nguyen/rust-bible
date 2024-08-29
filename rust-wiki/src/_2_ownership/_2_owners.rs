@@ -125,63 +125,88 @@ fn clone_data(){
     //      Both of their managed data is dropped.
 }
 
-// #### Ownership Transfer in Function Calls
+// -------------------------------------------------------------------------------------------------
+// ## Ownership Transfer: Function Calls
 //
 // Passing a value as a function argument will transfer ownership exactly like when a value is assigned to a variable.
 fn ownership_in_function_calls() {
-    // s1 manages a string on the heap
-    let s: String = String::from("hello"); // <<-- s is valid hereon
-    // some_string manages the string whose ownership was moved from s.
-    takes_ownership(s);       // <<-- some_string is valid and s is invalid hereon
-    // <<-- some_string is out of scope and no longer valid; it's data is dropped,
-    // The following line causes a compile-time error because s is no longer valid.
-    // print!(s); // ERROR: `s` is invalid here because ownership was moved.
+  // s1 manages a string on the heap
+  let s: String = String::from("hello"); // <<-- s is valid hereon
+  // some_string manages the string whose ownership was moved from s.
+  takes_ownership(s);       // <<-- some_string is valid and s is invalid hereon
+  // <<-- some_string is out of scope and no longer valid; it's data is dropped,
+  // The following line causes a compile-time error because s is no longer valid.
+  // print!(s); // ERROR: `s` is invalid here because ownership was moved.
 
-    // x manages 5
-    let x: i32 = 5;                       // <<-- x is valid hereon.
-    // some_integer manages 5 copied from x.
-    makes_copy(x);           // <-- some_integer is valid
-    // <<-- some_integer is out of scope and no longer valid
+  // x manages 5
+  let x: i32 = 5;                       // <<-- x is valid hereon.
+  // some_integer manages 5 copied from x.
+  makes_copy(x);           // <-- some_integer is valid
+  // <<-- some_integer is out of scope and no longer valid
 
-    // The following line works fine as x never became invalid.
-    println!("{}", x);
+  // The following line works fine as x never became invalid.
+  println!("{}", x);
 } // <<-- Both x and s are out of scope (and invalid).
-  //      Because s's ownership was already moved, there is nothing to drop.
+//      Because s's ownership was already moved, there is nothing to drop.
 
 fn takes_ownership(some_string: String) {   // <<-- some_string is valid hereon
-  println!("{some_string}");
+println!("{some_string}");
 } // <<-- some_string goes out of scope (and is no longer valid).
-  //      Its managed data is dropped.
+//      Its managed data is dropped.
 
 fn makes_copy(some_integer: i32) {          // <<-- some_integer is valid hereon
-  println!("{some_integer}");
+println!("{some_integer}");
 } // <<-- some_integer goes out of scope (and is no longer valid).
 
 // #### Ownership Transfer in Function Returns
 // Returning a value from a function can also transfer ownership.
 fn ownership_in_function_returns() {
-    // s1 manages a string on the heap
-    let s1 = gives_ownership();         // <<-- s1 is valid hereon
-    // s2 manages a string on the heap
-    let s2 = String::from("hello");     // <<-- s2 is valid hereon
-    // s3 manages a string on the heap whose ownership was moved from s2.
-    let s3 = takes_and_gives_back(s2); // <<-- s3 is valid and s2 is invalid hereon.
+  // s1 manages a string on the heap
+  let s1 = gives_ownership();         // <<-- s1 is valid hereon
+  // s2 manages a string on the heap
+  let s2 = String::from("hello");     // <<-- s2 is valid hereon
+  // s3 manages a string on the heap whose ownership was moved from s2.
+  let s3 = takes_and_gives_back(s2); // <<-- s3 is valid and s2 is invalid hereon.
 } // <<-- s3, s2, s1 go out of scope (and become invalid), and only s3's and s1's data are dropped.
-  //      Because s2's ownership was moved, there is nothing to drop.
+//      Because s2's ownership was moved, there is nothing to drop.
 
 fn gives_ownership() -> String {
-    // some_string manages a string on the heap
-    let some_string = String::from("yours"); // <<-- some_string is valid hereon
-    // some_string is returned and its ownership is moved
-    some_string
+  // some_string manages a string on the heap
+  let some_string = String::from("yours"); // <<-- some_string is valid hereon
+  // some_string is returned and its ownership is moved
+  some_string
 } // <<-- some_string goes out of scope (and is no longer valid).
-  //      Because its ownership was already moved, there is nothing to drop.
+//      Because its ownership was already moved, there is nothing to drop.
 
 fn takes_and_gives_back(a_string: String) -> String { // <<-- a_string is valid hereon
-    // a_string is returned and its ownership is moved
-    a_string
+  // a_string is returned and its ownership is moved
+  a_string
 }  // <<-- a_string goes out of scope (and is no longer valid).
-  //       Because its ownership was already moved, there is nothing to drop.
+//       Because its ownership was already moved, there is nothing to drop.
+
+// -------------------------------------------------------------------------------------------------
+// ## Ownership Transfer: Mutability
+//
+// As the owner decides the mutability of its value, mutability of data can be changed when ownership is transferred.
+//
+fn ownership_and_mutability() {
+  let immutable_box: Box<u32> = Box::new(5u32);
+
+  println!("immutable_box contains {}", immutable_box);
+
+  // Mutability error
+  // *immutable_box = 4;
+
+  // *Move* the box, changing the ownership (and mutability)
+  let mut mutable_box: Box<u32> = immutable_box;
+
+  println!("mutable_box contains {}", mutable_box);
+
+  // Modify the contents of the box
+  *mutable_box = 4;
+
+  println!("mutable_box now contains {}", mutable_box);
+}
 
 
 // -----------------------------------------------

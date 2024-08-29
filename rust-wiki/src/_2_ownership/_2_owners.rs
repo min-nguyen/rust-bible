@@ -184,6 +184,63 @@ fn takes_and_gives_back(a_string: String) -> String { // <<-- a_string is valid 
   //       Because its ownership was already moved, there is nothing to drop.
 
 
+// -----------------------------------------------
+// ## Ownership Transfer: Full and Partial Moves (Elaborated more in `structs.rs`)
+//
+// When assigning a datatype from one variable to another, a full Move, Copy, or Clone applies for the entire structure.
+//    let struct2 = struct1;
+// A Move, Copy, or Clone applies to all its fields, and determines whether or not the parent variable is still valid.
+// If a Move happens, the parent variable and its fields cannot be used afterwards.
+//
+// When assigning a component of a variable to another, a partial Move, Copy, or Clone applies for the entire structure.
+//    let x = struct1.field;
+// A Move, Copy, or Clone applies to just that field, and determines whether or not the component is still valid.
+// If a Move happens, then parent variable cannot be used afterwards as a whole, but the unmoved parts can still be used.
+//
+// We can also combine by-move/copy/clone and by-reference pattern bindings at the same time, when destructuring a variable.
+//    let Struct { field1, ref field2 } = x;
+//  which is syntax sugar for:
+//    let (field, field2) = (x.field1, &x.field2);
+// A Move, Copy, or Clone applies to the reassigned field, and determines whether or not the component is still valid.
+// A Borrow applies to the field we create a reference for, and so can still be used from the parent variable.
+// If a Move happens, then parent variable cannot be used afterwards as a whole, but the unmoved parts (which includes
+// the Borrow) can still be used.
+//
+
+fn partial_move_copy_clone_reference() {
+  #[derive(Debug)]
+  struct Person {
+      first_name: String,
+      last_name: String,
+      age: u8,
+      id: Box<u8>
+  }
+
+  let person = Person {
+      first_name: String::from("Alice"),
+      last_name: String::from("Smith"),
+      age: 20,
+      id: Box::new(0)
+  };
+
+  // `first_name` is referenced, `last_name` is moved, `age` is copied, and `id` is cloned.
+  let first_name: &String = &person.first_name;  // reference
+  let last_name: String = person.last_name;      // move
+  let age: u8 = person.age;                      // copy
+  let id: Box<u8>  = person.id.clone();          // clone
+
+  println!("The person's first_name is {}", first_name);
+  println!("The person's last_name is {}", last_name);
+  println!("The person's age is {}", age);
+  println!("The person's id is {}", id);
+
+  // `person` cannot be used but their first_name, age, and id, can be used as they are not moved
+  // println!("The person struct is {:?}", person); // Error! borrow of partially moved value.
+  println!("The person's first_name from person struct is {}", first_name);
+  println!("The person's age from person struct is {}", person.age);
+  println!("The person's od from person struct is {}", person.id);
+}
+
 // -------------------------------------------------------------------------------------------------
 // ## Mental Model: Ownership Transfer in practice.
 //

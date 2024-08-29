@@ -6,6 +6,7 @@
 //
 //         let v : T  = ...;
 //         let x : &T = &v;
+//         (We could also write `let ref x = v`, but the intended use of `ref` is for pattern matching.)
 //
 // Creating a reference is called borrowing, letting you borrow the value while:
 //    1) Not taking ownership of it

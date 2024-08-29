@@ -95,3 +95,8 @@ fn closure_borrow_mut() {
   // Can reuse the borrowed mutable value after clsre_borrow has finished using (and possibly mutating) it
   println!("After calling closure: {xs:?}");
 }
+
+
+// -----------------------------------------------
+// ## Closures: Moving, Copying, or Borrowing the Captured Values
+//

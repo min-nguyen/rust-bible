@@ -38,44 +38,45 @@ fn closures_vs_fns(){
 }
 
 // -----------------------------------------------
-// ## Closures: Moving, Copying, or Borrowing the Captured Values of the Closure Body
+// ## Closures: Moving or Borrowing the Captured Values into the Closure Body
 //
-// As closures are variables that own things, they can capture values from their environment in
+// The **declaration** of a closure determines whether we move or borrow its captured value into the body.
+//
+// As closures are variables that own things, *declaring* one will capture values from their environment in
 // three ways, which are the same as how a function can take a parameter:
-//  1. Capturing Ownership: Performing a Move (or Copy where possible) of *all* the captured values it uses.
+//  1. Capturing Ownership: Moving (or Copying where possible) *all* the captured values it uses.
 //       Syntax (using `move`)
 //          let clsre = move |...| { body }
-//  2. Capturing a Reference: Borrowing immutably *all* the captured values it uses, which is the **default**.
+//  2. Capturing a Reference: Immutably Borrowing *all* the captured values it uses, which is the **default**.
 //       Syntax (as normal):
 //          let clsre = | ...| { body }
-//  3. Capturing a Mutable Reference: Borrowing mutably *all* the captured mutable values it uses.
+//  3. Capturing a Mutable Reference: Mutably Borrowing *all* the captured mutable values it uses.
 //       Syntax (using `mut`):
 //          let mut clsre = | ...| { body }
 //
 // The closure decides which of these to use based on what its body does with the captured values.
 // (It is also possible to *selectively* move, copy, or borrow the captured values, by using some extra code.)
 
-fn closure_move_and_copy() {
+fn closure_move_in() {
   // x owns an i32 which implements Copy, and xs owns a Vec which does not.
   let x: i32 = 2;
   let xs: Vec<i32> = vec![1, 2, 3];
 
-  // this closure performs a Move of xs, and a Copy of x.
-  let fn_move = move || { print!("{x:?}, {xs:?}") };
+  // this closure, when declared, performs a Move of xs into the body, and a Copy of x.
+  let fn_move_in = move || { print!("{x:?}, {xs:?}") }; // Permanently moves ys into the closure
 
-  // can't use moved value
+  // can't use moved value: note that we didn't have to even call the function.
   // println!("{xs:?}"); // Error!
-
   // can use copied value
   println!("{x:?}");
 }
 
-fn closure_borrow_immut() {
+fn closure_immutborrow_in() {
   // x owns an i32 which implements Copy, and xs owns a Vec which does not.
   let x: i32 = 2;
   let xs: Vec<i32> = vec![1, 2, 3];
 
-  // this closure performs a (Immutable) Borrow of xs (and a Borrow or Copy of x).
+  // this closure performs a (Immutable) Borrow of xs into the body (and a Copy of x).
   let fn_borrow_immut = || { print!("{x:?}, {xs:?}") };
 
   fn_borrow_immut();
@@ -83,12 +84,12 @@ fn closure_borrow_immut() {
   println!("After calling closure: {xs:?}");
 }
 
-fn closure_borrow_mut() {
+fn closure_mutborrow_in() {
   // x owns an i32 which implements Copy, and xs *mutably* owns a Vec which does not.
   let x: i32 = 2;
   let mut xs: Vec<i32> = vec![1, 2, 3];
 
-  // this closure performs a Mutable Borrow of xs (and a Borrow or Copy of x).
+  // this closure performs a Mutable Borrow of xs into the body (and a  Copy of x).
   let mut fn_borrow_mut = || { print!("{:?}", xs.push(x)) };
 
   fn_borrow_mut();
@@ -96,7 +97,94 @@ fn closure_borrow_mut() {
   println!("After calling closure: {xs:?}");
 }
 
-
 // -----------------------------------------------
 // ## Closures: Moving Captured Values out of the Closure Body
 //
+// The **calling** of a closure determines when we mutate or move its captured value back out of the body.
+//
+// A closure body that captures a value can do any of the following:
+//  1. Move the captured value *out of* the closure, requiring us to first Move that captured value *into* the closure
+//  2. Mutate the captured value, requiring us to first Mutably Borrow or Mutably Move that Mutable value *into* the closure.
+//  3. Neither Move nor Mutate the value,
+
+
+fn closure_move_out() {
+  // x owns an i32 which implements Copy, and xs owns a Vec which does not.
+  let x: i32 = 2;
+  let xs: Vec<i32> = vec![1, 2, 3];
+
+  // this closure Moves xs out of the body, meaning it already (implicitly) Moved xs into the body.
+  let fn_move_out = || { return (xs, x) };
+
+  // can't use moved value
+  // println!("{xs:?}"); // Error!
+  // can use copied value
+  println!("{x:?}");
+}
+
+
+fn closure_mutate_out() {
+  let mut xs: Vec<i32> = vec![1, 2, 3];
+
+  // this closure mutates xs, where we Mutably Borrowed xs into the body.
+  let mut fn_borrow_in_mutate =   || { xs.push(2) };
+
+  fn_borrow_in_mutate();
+  // we can reuse the borrowed value
+  println!("{xs:?}"); // Error!
+
+  // this closure mutates xs, where we Mutably Moved xs into the body.
+  let mut fn_move_in_mutate = move  || { xs.push(2) };
+
+  fn_move_in_mutate();
+  // can't use moved value
+  // println!("{xs:?}"); // Error!
+}
+
+// -----------------------------------------------
+// ## Closures: The Fn Trait
+//
+// Closures automatically implement one, two, or all three of these Fn traits, depending on how their body handles its captured values:
+//
+//  1. FnOnce: Applies to all closures, as all can be called once.
+//
+//      A closure that moves captured values out of its body will only implement FnOnce, because it can only be called once.
+//
+//  2. FnMut: Applies to closures that don't move captured values out of their body, but may mutate them.
+//
+//      These closures can be called more than once while mutating their environment.
+//
+//  3. Fn: Applies to closures that don't move captured values out of their body, and that don't mutate them.
+//
+//      These closures can be called more than once without mutating their environment.
+//
+
+
+fn fn_trait() {
+
+  //// 1. FnOnce
+  // this closure when called Moves xs out of the body, meaning that its declaration has (implicitly) Moves xs into the body
+  let  xs: Vec<i32> = vec![1, 2, 3];
+  let fn_once_ = || { return (xs) }; // Moves xs into the closure, then when called, moves it back out.
+
+  fn_once_();
+  // fn_once(); // Error: use of moved value `xs` after it has already been moved
+
+  //// 2. FnMut
+  // this closure when called doesn't Move ys out of the body but mutates it, so implements FnMut
+  let mut ys: Vec<i32> = vec![1, 2, 3];
+  let mut fn_mut_ = move || { ys.push(2) };  // Permanently Moves ys into the closure,
+
+  fn_mut_();
+  fn_mut_(); // (we have only performed a single Move of ys when declaring the closure, so we can call this many times)
+
+  //// 3. Fn
+  // this closure when called neither moves or mutates ys out of the body, so implements Fn
+  let mut ys: Vec<i32> = vec![1, 2, 3];
+  let mut fn_ = move || { print!("{ys:?}") }; // Permanently Moves ys into the closure
+
+  fn_();
+  fn_(); // (we have only performed a single Move of ys when declaring the closure, so we can call this many times)
+
+}
+

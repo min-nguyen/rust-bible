@@ -103,10 +103,9 @@ fn closure_mutborrow_in() {
 // The **calling** of a closure determines when we mutate or move its captured value back out of the body.
 //
 // A closure body that captures a value can do any of the following:
-//  1. Move the captured value *out of* the closure, requiring us to first Move that captured value *into* the closure
+//  1. Move the captured value *out of* the closure, requiring us to first Move that captured value *into* the closure.
 //  2. Mutate the captured value, requiring us to first Mutably Borrow or Mutably Move that Mutable value *into* the closure.
-//  3. Neither Move nor Mutate the value,
-
+//  3. Neither Move nor Mutate the value.
 
 fn closure_move_out() {
   // x owns an i32 which implements Copy, and xs owns a Vec which does not.
@@ -144,7 +143,7 @@ fn closure_mutate_out() {
 // -----------------------------------------------
 // ## Closures: The Fn Trait
 //
-// Closures automatically implement one, two, or all three of these Fn traits, depending on how their body handles its captured values:
+// Closures automatically implement 1, 1 and 2, or all 3, of these Fn traits, depending on how their body handles its captured values:
 //
 //  1. FnOnce: Applies to all closures, as all can be called once.
 //

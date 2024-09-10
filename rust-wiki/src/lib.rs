@@ -24,6 +24,7 @@ mod _4_generics{
 }
 mod _5_functional_features{
     mod _1_closures;
+    mod _2_iterators;
 }
 
 fn main() {

@@ -8,8 +8,8 @@ mod _1_basics {
      mod _4_control_flow;
 }
 mod _2_ownership {
-    mod _2_owners;
-    mod _3_references;
+    mod _2_owners_and_scope;
+    mod _3_references_and_lifetimes;
     mod _4_slices;
 }
 mod _3_datatypes_and_traits {

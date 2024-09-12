@@ -8,8 +8,8 @@ mod _1_basics {
      mod _4_control_flow;
 }
 mod _2_ownership {
-    mod _2_owners;
-    mod _3_references;
+    mod _2_owners_and_scope;
+    mod _3_references_and_lifetimes;
     mod _4_slices;
 }
 mod _3_datatypes_and_traits {
@@ -19,12 +19,13 @@ mod _3_datatypes_and_traits {
     mod _4_traits;
 }
 mod _4_generics{
-    mod _1_generics;
-    mod _2_lifetimes;
+    mod _1_generic_types;
+    mod _2_lifetime_annotations;
 }
 mod _5_functional_features{
     mod _1_closures;
     mod _2_iterators;
+    mod _3_method_chaining;
 }
 
 fn main() {

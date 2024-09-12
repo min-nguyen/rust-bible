@@ -3,6 +3,28 @@ name = "rust-wiki"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+# There can only exist one [lib] per cargo package
+# > cargo build --lib
+[lib]
+name = "lib"
+path = "src/lib.rs"
 
+# There can exist multiple [[bin]]s or [[example]]s, which can be used to refer to specific .rs files.
+# > cargo build --bin <binary name>
+[[bin]]
+name = "example_binary"
+path = "src/lib.rs"
+# cargo build --bin
+
+# Crates can depend on other libraries from crates.io or other registries, git repositories, or subdirectories on your local file system.
 [dependencies]
+
+# In Rust, a library or executable program is called a crate. Crates are compiled and executed using the Rust compiler, rustc.
+# Rather than work only with crates and rustc, we can work with the Cargo as the Rust package manager.
+# Cargo does four things:
+#  1. Introduces two metadata files with various bits of package information.
+#  2. Fetches and builds your package’s dependencies.
+#  3. Invokes rustc or another build tool with the correct parameters to build your package.
+#  4. Introduces conventions to make working with Rust packages easier.
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

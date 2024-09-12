@@ -61,9 +61,9 @@ fn reference_deferencing_example() {
 // -------------------------------------------------------------------
 // ## Reference Lifetime
 //
-//    A reference's lifetime is a (named) region of code that it is guaranteed to point to a valid value.
+//    A reference's lifetime is a (named) region of code that the compiler guarantees to point to a valid value.
 //    It begins when it is declared and ends when it is no longer used, which must be before its pointed value goes out of scope.
-//    A reference's lifetime hence must not outlive the scope of its value.
+//    A reference's lifetime hence must not outlive the scope of its value; i.e. while references to an object exist, the object cannot be destroyed.
 //
 // Syntax Sugar for Lifetimes:
 //   The lifetime of a reference is usually implicit and hidden by syntax sugar.

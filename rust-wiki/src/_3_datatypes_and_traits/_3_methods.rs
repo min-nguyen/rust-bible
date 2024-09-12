@@ -1,13 +1,13 @@
 // -----------------------------------------------
 // # METHODS (AND ASSOCIATED FUNCTIONS)
 //
-// An  `impl` block implements a set of methods and associated functions for a Struct or Enum type (or Trait not covered yet).
+// An  `impl` block implements a set of "methods" and "associated functions" for a Struct or Enum type (or Trait not covered yet).
 //
 //    impl StructName/EnumName {
 //      fn method_name(self : &Self, ...) -> ... {
 //
 //      }
-//      fn fun_name(...) -> ... {
+//      fn assoc_fun_name(...) -> ... {
 //
 //      }
 //    }

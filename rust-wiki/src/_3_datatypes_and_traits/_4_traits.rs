@@ -1,10 +1,17 @@
 // -----------------------------------------------
 // # TRAITS
 //
-// Traits are a collection of methods and associated functions for an unknown type `Self` that any type can provide an implementation of.
+// Traits are a collection of:
+//   1. methods
+//   2. associated functions
+//   3. associated types
+// for an unknown type `Self` that any type can provide an implementation of.
+//
 // Combined with generics (later), trait bounds then let us specify abstract types as implementing these traits.
 //
 //    trait TraitName {
+//      type Assoc_Type_Name;
+//
 //      fn method_name(self : Self, ...);
 //      fn default_method_name(self : Self, ...) {
 //
@@ -13,6 +20,7 @@
 //    }
 //
 //    impl TraitName for Type {
+//      type Assoc_Type_Name = Specific_Assoc_Type;
 //      fn method_name(self : Self, ...) {
 //        ...
 //      }

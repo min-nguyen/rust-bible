@@ -7,13 +7,14 @@
 // The Iterator trait is used to implement iterators for specific collections.
 // It requires two things:
 //    1. The `Item` type, which is the type of elements being iterated over
-//    2. The `next` method, which tries to return the next element.
+//    2. The `next` method, which tries to return the next element, otherwise returning None when the iterator finishes.
 //
 //    pub trait Iterator {
 //      type Item;
 //      fn next(&mut self) -> Option<Self::Item>;
 //
-//      // there are some default methods, like `.into_iter()`, which are elided.
+//      // there are some provided default methods:
+//
 //    }
 //
 
@@ -31,8 +32,6 @@ impl Iterator for Fibonacci {
   // The return type is `Option<T>`:
   //     * When the `Iterator` is finished, `None` is returned.
   //     * Otherwise, the next value is wrapped in `Some` and returned.
-  // We use Self::Item in the return type, so we can change
-  // the type without having to update the function signatures.
   fn next(&mut self) -> Option<Self::Item> {
       let current: u32 = self.curr;
 

@@ -12,23 +12,22 @@
 //    trait TraitName {
 //      type Assoc_Type_Name;
 //
+//      fn assoc_fun_name(...) -> ...;
 //      fn method_name(self : Self, ...);
 //      fn default_method_name(self : Self, ...) {
 //
 //      }
-//      fn fun_name(...) -> ...;
 //    }
 //
 //    impl TraitName for Type {
 //      type Assoc_Type_Name = Specific_Assoc_Type;
+//      fn assoc_fun_name(...) -> ... {
+//        ...
+//      }
 //      fn method_name(self : Self, ...) {
 //        ...
 //      }
-//      fn fun_name(...) -> ... {
-//        ...
-//      }
 //    }
-//
 //
 // Traits in Rust can be thought of as type classes in Haskell with a type parameter `Self`:
 //    type class ClassName selftype where
@@ -41,14 +40,16 @@
 // Syntax:
 //
 //    trait TraitName {
+//      fn assoc_fun_name(...) -> ...;
 //      fn method_name(&self, ...);
 //      fn default_method_name(&self, ...) {
 //
 //      }
-//      fn fun_name(...) -> ...;
 //    }
 //
 trait Show {
+  type AltShowType;
+  fn alt_show(s : String) -> Self::AltShowType;
   // Method
   fn show(&self) -> String;
   // Default method
@@ -70,13 +71,16 @@ trait Show {
 // Syntax:
 //
 //    impl TraitName for Type {
+//      fn assoc_fun_name(...) -> ... {
+//        ...
+//      }
 //      fn method_name(self : Self, ...) {
 //        ...
 //      }
-//      fn fun_name(...) -> ... {
-//        ...
-//      }
 //    }
+//
+// Using Traits
+//
 //
 struct User {
   active: bool,
@@ -85,6 +89,14 @@ struct User {
 }
 
 impl Show for User {
+  type AltShowType = Vec<char>;
+  fn alt_show(s : String) -> Self::AltShowType {
+    let mut v: Vec<char> = vec![];
+    for c in s.chars() {
+      v.push(c);
+    }
+    v
+  }
   fn show(&self) -> String {
     self.username.to_string()
   }
@@ -98,4 +110,6 @@ pub fn using_traits_example(){
   };
   let s: String = user1.show_twice();
   print!("{s}");
+  let v: Vec<char> = User::alt_show(user1.show());
+  print!("{v:?}");
 }

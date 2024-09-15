@@ -25,13 +25,16 @@
 // Syntax:
 //
 //    impl StructName/EnumName {
+//      fn assoc_fun_name(...) -> ... {
+//
+//      }
 //      fn method_name(&self, ...) -> ... {
 //
 //      }
-//      fn fun_name(...) -> ... {
-//
-//      }
 //    }
+//
+// *Associated functions* have no `self` parameter.
+// - These are often used as constructors that return a new instance of the type.
 //
 // *Methods* are a specific kind of associated function whose first parameter is always named `self`.
 // - The type of the `self` variable can either be:
@@ -48,10 +51,6 @@
 //            1.  fn method_name(mut self: Self, ...)
 //            2.  fn method_name(mut self: &Self, ...)
 //            3.  fn method_name(mut self: &mut Self, ...)
-//
-// *Associated functions* that are not methods have no `self`` parameter.
-// - These are often used as constructors that return a new instance of the type.
-
 #[derive(Clone, Copy)]
 struct Rectangle {        // Rectangle is copyable
   width: u32,
@@ -59,6 +58,10 @@ struct Rectangle {        // Rectangle is copyable
 }
 
 impl Rectangle {
+  // Rectangle::new is an associated function that constructs and returns a new Rectangle struct.
+  fn new(width: u32, height: u32) -> Self {
+      Rectangle{width, height}
+  }
   // Rectangle::area_withselfval is a method that takes ownership of the receiver `self :: Rectangle`, which copies it
   fn area_withselfval(self) -> u32 {
       return self.width * self.height
@@ -66,10 +69,6 @@ impl Rectangle {
   // Rectangle::area_withselfref is a method that creates a reference that borrows the receiver `self :: Rectangle`
   fn area_withselfref(&self) -> u32 {
       return self.width * self.height
-  }
-  // Rectangle::new is an associated function that constructs and returns a new Rectangle struct.
-  fn new(width: u32, height: u32) -> Self {
-      Rectangle{width, height}
   }
 }
 
@@ -80,6 +79,10 @@ enum Message {
 }
 
 impl Message {
+  // Message::new is an associated function that constructs and returns a new Message::Move variant.
+  fn new(x: i32, y: i32) -> Self {
+      Message::Move{x, y}
+  }
   // Message::sum_withselfval is a method that takes ownership of the receiver `self :: Message`, which moves it
   fn sum_withselfval(self) -> i32 {
       match self {
@@ -97,10 +100,6 @@ impl Message {
         // s_ref is reference to the String value because self : &Self is a reference.
         Message::Write(s_ref) => 0,
       }
-  }
-  // Message::new is an associated function that constructs and returns a new Message::Move variant.
-  fn new(x: i32, y: i32) -> Self {
-      Message::Move{x, y}
   }
 }
 

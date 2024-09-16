@@ -1,7 +1,20 @@
 
 // # Control flow
-fn control_flow() {
+fn control_flow() -> () {
+  // ## Explicit (Early) Return: Statement-Based
+  // Using `return` as a statement will return a value from the current function, exiting early.
+  return ();
+
   // ## If(-Else) Expressions
+  let x: bool =
+      if 3 < 5 {
+          println! ("3 < 5");
+          true
+      } else {
+          println! ("3 > 5");
+          false
+      };
+  // ## If(-Else) Statement
   let x: bool =
       if 3 < 5 {
           println! ("3 < 5");
@@ -13,9 +26,9 @@ fn control_flow() {
 
   // ## Loops
   // These recurse forever until explicitly broken out of.
-  //  1. Using return will exit the current function.
-  //  2. Using break will only exit the current loop.
-  //  3. Using continue will skip to the next loop iteration.
+  //  1. Using `return` will exit the current function.
+  //  2. Using `break` will only exit the current loop.
+  //  3. Using `continue` will skip to the next loop iteration.
   // We can also specify loop labels with a single quote, 'loop_label, to indicate which loop to `break` or `continue` to.
   let mut count: i32 = 0;
   'counting_up: loop {            // Label this loop as "counting_up"
@@ -49,4 +62,8 @@ fn control_flow() {
   for element in arr {
       println!("the value is: {element}");
   }
+
+  // ## Implicit Return: Expression-Based
+  // Ending a function with an expression i.e. without a semicolon will return it.
+  ()
 }

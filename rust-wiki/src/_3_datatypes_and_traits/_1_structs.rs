@@ -20,8 +20,12 @@
 //
 // Syntax:
 //
+//    // With named fields:
 //    struct StructName { field_name: field_type
 //                      , ...}
+//
+//    // With unnamed fields:
+//    struct StructName (field_type, ...)
 //
 
 struct User {
@@ -51,10 +55,14 @@ struct User {
 //
 // Syntax:
 //
-//    let x = StructName { field_name: field_value
+//    // For named fields:
+//    let s1 = StructName { field_name: field_value
 //                      , ...}
+//    let x = s1.field_name;
 //
-//    let y = x.field_name;
+//    // For unnamed fields
+//    let s2 = StructName (field_value, ...)
+//    let x = s2.0;
 //
 // Syntax sugar:
 //

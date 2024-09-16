@@ -58,23 +58,32 @@ fn data_types() {
 
   // #### String Slices (`&str`, essentially a byte slice reference `&[u8]` that guarantees valid UTF-8 characters)
   // A string slice is an immutable reference to a sequence of UTF-8 encoded bytes.
-  // String slices are often referred to as "string literals" when hard-coded in the program.
-  let s: &str = "hello, world"; // String slice, typically immutable and stored in the binary or stack
+
+  // We can create a `&str` by:
+  // 1. Referencing a hard-coding a "string literal", stored on the stack.
+  let str_version: &str = "hello, world"; // String slice, typically immutable and stored in the binary or stack
+  // 2. Referencing a dynamic String type, stored on the heap.
+  let string_version : String = String::from("s");
+  let str_version: &str = &string_version;
 
   // We can access elements in a string slice by indexing:
-  let first_char = &s[0..1]; // Slices the first character, returns "h"
+  let first_char = &str_version[0..1]; // Slices the first character, returns "h"
 
   // #### Strings (`String`, essentially a byte vector `Vec<u8>` that guarantees valid UTF-8 characters)
-  // A `String` is a heap-allocated, growable, mutable string type. It's ideal when you need to store or manipulate dynamic string data.
+  // A `String` is a heap-allocated, growable, mutable string type.
 
-  // We create a `String` using the `String::from` function or by converting a string slice:
-  let mut s = String::from("hello");
+  // We can create a `String` by:
+  //  1. Converting a &str using the `String::from()` function
+  let str_version: &str = "hello";
+  let mut string_version : String = String::from(str_version);
+  //  2. Owning a &str's data using the `ToOwned::to_owned()` method which works by cloning
+  let mut string_version : String = str_version.to_owned();
 
   // We can mutate a `String`, adding more content:
-  s.push_str(", world!"); // Appends ", world!" to the string
+  string_version.push_str(", world!"); // Appends ", world!" to the string
 
   // `String` can also grow dynamically at runtime:
-  s.push('!'); // Adds a single character to the end
+  string_version.push('!'); // Adds a single character to the end
 
 
   // ### Invalid Element Acccess

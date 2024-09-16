@@ -4,18 +4,22 @@ use std::io;
 // Every value in Rust is of a certain data type, where type annotations are specified with `:`.
 // There are two data type subsets: scalar and compound.
 fn data_types() {
+
   // ## Scalar Types
   // A scalar type represents a single value. Rust has four primary scalar types: integers, floats, Booleans, and characters.
-  let i: i64 = 20;
-  let f: f64 = 20.0;
-  let c: char = 'z';
-  let b: bool = true;
+  let byte: u8 = 0;
+  let int: i64 = 20;
+  let float: f64 = 20.0;
+  let char: char = 'z';
+  let bool: bool = true;
 
   // ## Compound Types
   // Compound types can group multiple values into one type. Rust has two primitive compound types: tuples and arrays.
 
   // ### Tuples
-  // A tuple groups values with a variety of types into one compound type.
+  // A tuple is a fixed-size, heterogenous grouping of values.
+  // Tuples are allocated on the stack, as they have a known number of elements.
+
   // We create a tuple by writing a comma-separated list of values inside parentheses, `(a, b, ...)`.
   let tup: (i32, f64, u8) = (500, 6.4, 1);
   // We can pattern match to destructure a tuple value:
@@ -24,13 +28,54 @@ fn data_types() {
   let tup_2: u8 = tup.2;
 
   // ### Arrays
-  // An array groups values with the same type. Arrays are allocated on the stack, as they have a fixed number of elements.
+  // An array is a fixed-size, homogeneous sequence of values.
+  // Arrays are allocated on the stack, as they have a known number of elements.
+
   // We create an array by writing a comma-separated list of values inside square brackets, `[a, b ...]`.
   let arr: [i32; 5] = [1, 2, 3, 4, 5];
   // We can also initialise an array to contain the same value for each element by using `;`
   let arr: [i32; 5] = [3; 5]; // = [3, 3, 3, 3, 3]
   // We can access array elements directly by using `array[idx]`:
   let arr_2: i32 = arr[2];
+
+  // ### Vectors
+  // A vector is a dynamic, growable homogeneous sequence of values that can change size at runtime.
+  // Vectors are allocated on the heap because their size can change and thus cannot be known at compile time.
+
+  // We create a vector using the `vec!` macro:
+  let mut vec: Vec<i32> = vec![1, 2, 3, 4, 5];
+
+  // We can also create an empty vector and push elements to it:
+  let mut empty_vec: Vec<i32> = Vec::new();
+  empty_vec.push(10); // Adds 10 to the vector
+  empty_vec.push(20); // Adds 20 to the vector
+
+  // Vectors allow indexing similar to arrays:
+  let third_element = vec[2]; // Accesses the third element (index 2)
+
+  // ### Strings
+  // Strings in Rust come in two primary types: `String` (heap-allocated, growable) and `&str` (string slices, usually stack-allocated or part of a larger structure).
+
+  // #### String Slices (`&str`, essentially a byte slice reference `&[u8]` that guarantees valid UTF-8 characters)
+  // A string slice is an immutable reference to a sequence of UTF-8 encoded bytes.
+  // String slices are often referred to as "string literals" when hard-coded in the program.
+  let s: &str = "hello, world"; // String slice, typically immutable and stored in the binary or stack
+
+  // We can access elements in a string slice by indexing:
+  let first_char = &s[0..1]; // Slices the first character, returns "h"
+
+  // #### Strings (`String`, essentially a byte vector `Vec<u8>` that guarantees valid UTF-8 characters)
+  // A `String` is a heap-allocated, growable, mutable string type. It's ideal when you need to store or manipulate dynamic string data.
+
+  // We create a `String` using the `String::from` function or by converting a string slice:
+  let mut s = String::from("hello");
+
+  // We can mutate a `String`, adding more content:
+  s.push_str(", world!"); // Appends ", world!" to the string
+
+  // `String` can also grow dynamically at runtime:
+  s.push('!'); // Adds a single character to the end
+
 
   // ### Invalid Element Acccess
   // Rust protects you against invalid element access by immediately exiting instead of allowing the memory access and continuing.

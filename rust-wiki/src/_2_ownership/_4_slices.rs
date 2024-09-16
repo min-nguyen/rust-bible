@@ -1,13 +1,11 @@
 // -----------------------------------------------
 // # SLICE REFERENCES
 //
-// A slice [T] is a contiguous sequence of data of type T stored in memory, being a slice of some
-// collection rather than the entire collection itself.
-// It may be part of something stored on either the stack or heap.
+// The array type [T; n] represents a contiguous sequence of data of type T.
+// These have a known size n at compile-time so the contents are allocated on the stack, and we can directly use values of this type in a program.
 //
-// The type [T] is designed to represent sequences of an unknown size at compile-time.
-// However, every variable('s value) in Rust must have a known size n at compile time.
-// Thus, only variables of type [T; n] can be used directly encode a slice in a program.
+// The slice type [T] is designed to represent a contiguous sequence of data of type T, being a slice of some collection (e.g. an array [T; n] or data structure like a Vec<T> or String) rather than the entire collection itself.
+// These have an unknown size at compile-time: as every variable in Rust must have a known size, we cannot directly use values of this type.
 //
 // A slice reference (&[T]) provides a way to refer to a slice ([T]) without needing a specific size at compile-time.
 // It is represented in memory as two parts:
@@ -17,6 +15,9 @@
 // By including the slice length in the reference value, this lets us:
 //    * Know the size of the slice reference type &[T] at compile-time.
 //    * Know the size of the slice at run-time that we can safely refer to.
+// The slice being referenced can either be on the stack or heap, depending on what the original datatype was.
+//    - If the slice references an array or fixed-size data structure that is allocated on the stack, the data itself is on the stack.
+//    - If the slice references data stored in a heap-allocated structure like a Vec<T> or String, the data is on the heap, but the slice's metadata (pointer and length) is still on the stack.
 
 // An array [T; n] is a static sequence of elements of a known-size.
 fn arrslice_example() {

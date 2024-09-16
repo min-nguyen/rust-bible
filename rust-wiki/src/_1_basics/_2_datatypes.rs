@@ -57,12 +57,12 @@ fn data_types() {
   // Strings in Rust come in two primary types: `&str` and `String`.
 
   // #### String Slices (`&str`, essentially a byte slice reference `&[u8]` that guarantees valid UTF-8 characters)
-  // A string slice is an immutable reference to a sequence of UTF-8 encoded bytes.
+  // A string slice is an immutable reference to a sequence of UTF-8 encoded bytes stored on the stack or heap.
 
   // We can create a `&str` by:
-  // 1. Referencing a hard-coding a "string literal", stored on the stack.
-  let str_version: &str = "hello, world"; // String slice, typically immutable and stored in the binary or stack
-  // 2. Referencing a dynamic String type, stored on the heap.
+  // 1. Referencing a hard-coding a "string literal" stored on the stack.
+  let str_version: &str = "hello, world"; // String slice, typically immutable and stored in the binary and stack
+  // 2. Referencing a dynamic String type stored on the heap.
   let string_version : String = String::from("s");
   let str_version: &str = &string_version;
 
@@ -70,7 +70,7 @@ fn data_types() {
   let first_char = &str_version[0..1]; // Slices the first character, returns "h"
 
   // #### Strings (`String`, essentially a byte vector `Vec<u8>` that guarantees valid UTF-8 characters)
-  // A `String` is a heap-allocated, growable, mutable string type.
+  // A `String` has ownership over a growable mutable string stored on the heap.
 
   // We can create a `String` by:
   //  1. Converting a &str using the `String::from()` function

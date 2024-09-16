@@ -54,7 +54,7 @@ fn data_types() {
   let third_element = vec[2]; // Accesses the third element (index 2)
 
   // ### Strings
-  // Strings in Rust come in two primary types: `String` (heap-allocated, growable) and `&str` (string slices, usually stack-allocated or part of a larger structure).
+  // Strings in Rust come in two primary types: `&str` and `String`.
 
   // #### String Slices (`&str`, essentially a byte slice reference `&[u8]` that guarantees valid UTF-8 characters)
   // A string slice is an immutable reference to a sequence of UTF-8 encoded bytes.

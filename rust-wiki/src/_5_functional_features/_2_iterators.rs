@@ -39,6 +39,8 @@
 //         a. Defining the `Item` type
 //         b. Defining the `next(&mut self)` method
 
+use std::{collections::vec_deque::Iter, iter::{Filter, Map}};
+
 // Struct for a Sequence of Fibonacci numbers.
 struct Fibonacci {
   curr: u32,
@@ -67,12 +69,14 @@ impl Iterator for Fibonacci {
 //
 // The Iter<'a, T>,  IterMut<'a, T>, and IntoIter<'a, T> structs are concrete implementation of the `Iterator` trait.
 // -  Iter<'a, T> borrows a collection T and lets us iterate over references to its elements
+//       fn next(&mut self) -> Option<&T>;
 // -  IterMut<'a, T> mutably borrows a collection T lets us iterate over mutable references to its elements
+//       fn next(&mut self) -> Option<&mut T>;
 // -  IntoIter<'a, T> takes ownership of (moves) a collection T lets us iterate and take ownership of its elements
+//       fn next(&mut self) -> Option<T>;
 //
 // Structs T that are collections in the standard library _often_ come with three common methods
 // for creating an Iter<'a, T>, from that collection:
-//
 //   1. iter(&self), which iterates over &T, hence borrowing T and its elements.
 //      This returns an `Iter<'a, T>`
 //   2. iter_mut(&mut self), which iterates over &mut T, hence mutably borrowing T and its elements.
@@ -144,15 +148,24 @@ fn iterator_collect() {
 // ## Iterators: "Iterator Adaptors" -- Methods that Produce Other Iterators (and Method Chaining)
 //
 // **Iterator adaptors**` are Methods defined on the Iterator trait.
-// They don't consume iterators and so do not perform any computation.
-// They instead produce new Iterators by nesting them.
+// - They don't consume iterators and so do not perform any computation.
+// - They instead produce new Iterators by nesting them.
+// - To use the result of the iterator adaptors, they must eventually be consumed
 
 // Iterator adaptor: map() and filter()
 fn iterator_map_filter() {
-  let v2  =
-    vec![1, 2, 3]
-      .iter() // Creates an iterator (a concrete Iter<> struct) that borrows elements
-      .map(|&x| x + 1) // Returns another iterator ( a concrete Map<> struct)
-      .filter(|&x| x > 0);// Returns another iterator ( a concrete Filter<> struct)
-      // .collect(); // Consumes the iterator and collects the resulting values into a collection datatype
+  let v: Vec<i32> =  vec![1, 2, 3];
+
+  // Creates an iterator (a concrete Iter<> struct) that borrows elements
+  let v_iter : std::slice::Iter<i32>
+    = v.iter();
+  // Returns another iterator ( a concrete Map<> struct)
+  let v_iter_map : Map <std::slice::Iter<i32> ,_>
+    = v_iter.map(|x_ref: &i32| x_ref );
+  // Returns another iterator ( a concrete Filter<> struct)
+  let v_filter_map_iter: Filter<Map <std::slice::Iter<i32> ,_>, _>  =
+      v_iter_map.filter(|x_ref_ref: &&i32| **x_ref_ref > 0);
+
+  // Consumes all iterators and collects the resulting values into a collection datatype
+  let v_refs : Vec<&i32> = v_filter_map_iter.collect();
 }

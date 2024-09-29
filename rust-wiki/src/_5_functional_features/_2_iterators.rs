@@ -11,7 +11,7 @@
 //    2. The `next(&mut self) -> Option<Self::Item>` method.
 //       This consumes (mutates) the iterator's internal state by advancing it forward, and element it returns is no longer
 //       available from that iterator in future next() calls.
-//       Note that next() does not consume the iterator itself, as it borrows it mutably.
+//       Note that next(&mut self) does not consume the iterator itself, as it borrows it mutably.
 //       ### Iterator Ownership
 //        - If the iterator owns the elements, next() consumes the elements themselves (they are moved).
 //        - If the iterator borrows the elements, next() does not consume the elements, but only returns references to them.
@@ -37,7 +37,7 @@
 //   1. Creating a struct to hold the iterator's state
 //   2. Implementing the `Iterator` for that struct.
 //         a. Defining the `Item` type
-//         b. Defining the `next()` method
+//         b. Defining the `next(&mut self)` method
 
 // Struct for a Sequence of Fibonacci numbers.
 struct Fibonacci {
@@ -73,20 +73,20 @@ impl Iterator for Fibonacci {
 // Structs T that are collections in the standard library _often_ come with three common methods
 // for creating an Iter<'a, T>, from that collection:
 //
-//   1. iter(), which iterates over &T, hence borrowing T and its elements.
+//   1. iter(&self), which iterates over &T, hence borrowing T and its elements.
 //      This returns an `Iter<'a, T>`
-//   2. iter_mut(), which iterates over &mut T, hence mutably borrowing T and its elements.
+//   2. iter_mut(&mut self), which iterates over &mut T, hence mutably borrowing T and its elements.
 //      This returns an `IterMut<'a, T>`
-//   3. into_iter(), which iterates over T, hence taking ownership of T and its elements.
+//   3. into_iter(self), which iterates over T, hence taking ownership of T and its elements.
 //      This returns an `IntoIter<'a, T>`
 //
 //  (These are methods directly associated with structs like Vec<T> or slices &[U], and are not part of any trait.)
 
 fn borrowing_iterator(){
-  let v = vec![1,2,3];
+  let v = vec![Box::new(1)];
   // Creates an iterator that borrows v1 and its elements
-  let v_iter: std::slice::Iter<'_, i32> = v.iter();
-  v_iter.map(|x: &i32| *x + 1);
+  let v_iter = v.iter();
+  let v: Vec<&Box<i32>> = v_iter.map(|x: &Box<i32>| x ).collect();
 
   // We can't create a temporary Vec that is freed from the heap after the scope of the statement
   // and then use an iterator that borrows it:
@@ -115,40 +115,44 @@ fn owning_iterator(){
 // These are produced by calling methods like map() and filter().
 
 
-
 // ## Iterators: "Consuming Adaptors" -- Methods that Consume the Iterator (Laziness)
 //
-// **Consuming adaptors** are methods that *consume* iterators when called, and do so by calling `next()`.
-// These methods always take ownership of the iterator itself (i.e. `self` not `&self`) as they need to
-// consume it, making the original iterator no longer usable. This is in contrast to `next(&mut self)`,
-// which mutably borrows the iterator and only consumes its internal state.
-//
-// An example of a consuming adaptor is:
-//    `sum(self) -> Self::Item`, which is a method from the Sum trait.
+// **Consuming adaptors** are methods fn(self) that:
+//  - Take ownership of the iterator and iterate through the items by calling next(&mut self).
+//    Hence makes the original iterator no longer usable.
+//  - Note that `next(&mut self)` *within* any iterator still only mutably borrows each item.
+
+// Consuming Adaptor: sum()
 fn iterator_sum() {
   let v1: Vec<i32> = vec![1, 2, 3];
   let v1_iter: std::slice::Iter<'_, i32> = v1.iter();
-  // The sum(self) method takes ownership of the iterator and iterates through the items by calling next().
   let total: i32 = v1_iter.sum();
-
-  assert_eq!(total, 6);
 }
-
+// Consuming Adaptor: for_each()
+fn iterator_for_each() {
+  let v1: Vec<i32> = vec![1, 2, 3];
+  let v1_iter: std::slice::Iter<'_, i32> = v1.iter();
+  let unit : () = v1_iter.for_each(|x| println!("{}", x));
+}
+// Consuming Adaptor: collect()
+fn iterator_collect() {
+  let v1: Vec<i32> = vec![1, 2, 3];
+  let v1_iter: std::slice::Iter<'_, i32> = v1.iter();
+  let v1_refs: Vec<&i32> = v1_iter.collect();
+}
 
 // ## Iterators: "Iterator Adaptors" -- Methods that Produce Other Iterators (and Method Chaining)
 //
-// **Iterator adaptors**` are Methods defined on the Iterator trait that don't consume iterators
-// (perform any computation), but instead produce new iterators by changing some aspect of the original one.
-//
-// An example of an Iterator adaptor is:
-//   - map
-//   - filter
-fn iterator_map() {
-  let v2 : Vec<i32> =
+// **Iterator adaptors**` are Methods defined on the Iterator trait.
+// They don't consume iterators and so do not perform any computation.
+// They instead produce new Iterators by nesting them.
+
+// Iterator adaptor: map() and filter()
+fn iterator_map_filter() {
+  let v2  =
     vec![1, 2, 3]
       .iter() // Creates an iterator (a concrete Iter<> struct) that borrows elements
       .map(|&x| x + 1) // Returns another iterator ( a concrete Map<> struct)
-      .filter(|&x| x > 0)// Returns another iterator ( a concrete Filter<> struct)
-      .collect(); // Consumes the iterator and collects the resulting values into a collection datatype
+      .filter(|&x| x > 0);// Returns another iterator ( a concrete Filter<> struct)
+      // .collect(); // Consumes the iterator and collects the resulting values into a collection datatype
 }
-

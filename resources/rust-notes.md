@@ -1,35 +1,59 @@
-#### Installing rustup on Linux
+# Installing rustup on Linux
 
 Install:
+```sh
 $ curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
 Restart shell, then:
 $ rustc --version
 Updating:
 $ rustup update
+```
 
-### Using cargo
+# Cargo
 
-#### Creating a Cargo project:
+## Creating a Cargo project:
+
+```sh
 $ cargo new hello_cargo
+```
 
-You’ll see that Cargo has generated two files and one directory for us: a Cargo.toml file and a `src` directory with a main.rs file inside.
+You’ll see that Cargo has generated two files and one directory for us: a Cargo.toml file and a `src` directory with a `main.rs` file inside.
 1. This Cargo.toml is Cargo’s configuration format.
   - [package], is a section heading that indicates that the following statements are configuring a package. As we add more information to this file, we’ll add other sections.
-  - The next three lines set the configuration information Cargo needs to compile your program: the name, the version, and the edition of Rust to use. We’ll talk about the edition key in Appendix E.
+  - The next three lines set the configuration information Cargo needs to compile your program: the name, the version, and the edition of Rust to use.
   - The last line, [dependencies], is the start of a section for you to list any of your project’s dependencies. In Rust, packages of code are referred to as crates.
 2. Cargo expects your source files to live inside the src directory. The top-level project directory is just for README files, license information, configuration files, and anything else not related to your code.
 
-#### Building and running a Cargo project:
+## Structure of a Cargo Project
+
+## Building & Running a Rust Project
+
+By default, this command creates an executable file for `main.rs` in target/debug/hello_cargo rather than in your current directory. Because the default build is a debug build, Cargo puts the binary in a directory named debug.
+
+```sh
 $ cargo build
 $ ./target/debug/hello_cargo
-
-This command creates an executable file in target/debug/hello_cargo (or target\debug\hello_cargo.exe on Windows) rather than in your current directory. Because the default build is a debug build, Cargo puts the binary in a directory named debug.
+```
 
 Alternatively, we can build and then execute in one command:
+```sh
 $ cargo run
+```
 
 And we can also check if a Cargo project compiles without producing an executable:
+
+```sh
 $ cargo check
+```
+
+If there are multiple executables i.e. binaries in the cargo.toml file, specified under `[[bin]]` with each rust file having its own main() function:
+
+
+We can run specific ones by using `--bin <binary_name>` to select the binary.
+
+```sh
+$ cargo run --bin main1
+```
 
 
 # Variables and references

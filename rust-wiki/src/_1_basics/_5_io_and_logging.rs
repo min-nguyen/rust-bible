@@ -1,5 +1,3 @@
-
-
 /* StdOut and StdErr
 
 On most operating systems, a program can write to two output streams, stdout and stderr. stdout is for the program’s actual output, while stderr allows errors and other messages to be kept separate from stdout. That way, output can be stored to a file or piped to another program while errors are shown to the user.
@@ -26,12 +24,8 @@ fn main() {
     > RUST_LOG=<log-level> cargo run
     e.g.
     > RUST_LOG=info cargo run
-    or, for any main() function found in an executable file `src/prog.rs`.
-    > RUST_LOG=<log-level> cargo run  --bin prog
-   */
+  */
 }
-
-
 
 /* Progress bar
 

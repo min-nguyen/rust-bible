@@ -250,3 +250,28 @@ impl<T : Copy> Decrement<Point<i32, T>> for Point<i32, T> {
            , y : self.y }
   }
 }
+
+
+// -----------------------------------------------
+// ## Resolving Ambiguous Generic Parameters
+
+// Most of the time when generics are involved, the compiler can infer the generic parameters automatically:
+//
+//    let mut v = Vec::new();   //v must be a Vec<T> but we don't know what T is yet
+//    v.push(true);             // v just got a bool value, so T must be bool!
+//
+// Without the second line though, we would need to assist the compiler:
+//
+//    let v = Vec::new();
+//      ^^^^^^^^ cannot infer type for `T`
+//                note: type annotations or generic parameter binding required
+//
+// We can solve this using either:
+//  1. a type annotation.
+//  2. a generic parameter binding (useful in situations where we don’t want to bind the result to a variable).
+//
+// Syntax:
+//  1. Type annotation:
+//      let v: Vec<bool> = Vec::new();
+//  2. Generic parameter binding:
+//      let v = Vec::<bool>::new();
